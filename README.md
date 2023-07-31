@@ -13,7 +13,7 @@ Repository of scripts I've made for Fusion and DaVinci Resolve
     - [Edit](#edit)
     - [Deliver](#deliver)
     - [Utility](#utility)
-        - [MigrateSourceClips](#migratesourceclips)
+        - [Relink Media Pool Clips](#relink-media-pool-clips)
         - [Remove Empty Bins](#remove-empty-bins)
 
 
@@ -49,7 +49,7 @@ If a script doesn't seem to do anything, go to `Workspace > Console` and make a 
 ## Deliver
 
 ## Utility
-### MigrateSourceClips
+### Relink Media Pool Clips
 Useful for if you have moved your entire project structure to a new folder. Allows you to relink all file paths for all projects in a project manager folder.
 
 #### Instructions
