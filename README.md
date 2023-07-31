@@ -13,6 +13,7 @@ Repository of scripts I've made for Fusion and DaVinci Resolve
     - [Edit](#edit)
     - [Deliver](#deliver)
     - [Utility](#utility)
+        - [MigrateSourceClips](#migratesourceclips)
         - [Remove Empty Bins](#remove-empty-bins)
 
 
@@ -48,5 +49,21 @@ If a script doesn't seem to do anything, go to `Workspace > Console` and make a 
 ## Deliver
 
 ## Utility
+### MigrateSourceClips
+Useful for if you have moved your entire project structure to a new folder. Allows you to relink all file paths for all projects in a project manager folder.
+
+#### Instructions
+For each project, replace all clips with a certain filename prefix to a new prefix.
+To use this, use the following steps:
+1. Copy the folder with all your footage to a new location.
+2. In the Project manager, make sure there is a folder that contains only projects whose clips are ALL in the folder from step 1.
+3. Run this script. In the first box, indicate the OLD path, ending with the appropriate slash (mac) or backslash (windows)
+4. In the second box, indicate the NEW folder. Make sure that if what's written in the first box is substituted for what's in the second box, the clips will all still exist!
+5. BACK UP YOUR PROJECT DATABASE
+6. Run once with the "I backed up my project database" box unchecked. This will do a dry run.
+7. Check the console after the dry run to make sure that it got through all your projects without having difficulty finding a file.
+8. Run the script again with the checkbox checked.
+9. Cross your fingers.
+
 ### Remove Empty Bins
 Deletes all bins in the media pool that do not contain any clips.
