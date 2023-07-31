@@ -31,24 +31,35 @@ function traverse_clips(mediaPool, folder, dry_run)
     for i, clip in pairs(folder:GetClipList()) do
         if i ~= "__flags" then
             file_path = clip:GetClipProperty("File Path")
+            clip_name = clip:GetName()
             if file_path ~= nil and file_path ~= "" then
-                print("\nCurr clip: ", clip:GetName())
-                print("File path: ", clip:GetClipProperty("File Path"))
-                suffix = string.match(file_path, string.format("^%s(.*)", old_prefix))
-                fn = clip:GetName()
-                new_fn = string.format("%s%s", new_prefix, suffix)
-                new_dir = string.match(new_fn, string.format("^(.+)%s$", fn))
+                print("\nCurr clip: ", clip_name)
+                print("File path: ", file_path)
+                suffix = string.match(file_path, string.format("^%s(.+)$", old_prefix:gsub('%W', function(x) return '%'..x end)))
 
                 if suffix == nil then
                     -- Let's check if the file_path starts with the new_prefix.
-                    suffix = string.match(file_path, string.format("^%s(.*)", new_prefix))
-                    new_fn = string.format("%s%s", new_prefix, suffix)
-                    new_dir = string.match(new_fn, string.format("^(.+)%s$", fn))
-
+                    suffix = string.match(file_path, string.format("^%s(.*)", new_prefix:gsub('%W', function(x) return '%'..x end)))
                     if suffix ~= nil then
-                        print("Appears to already be linked.")
+                        print("Appears to already be linked. Skipping...")
                     end
                 end
+
+                if string.find(suffix, "%[(%d+)%-%d+%]") ~= nil then
+                    -- Handle image sequences.
+                    first_img_num = string.match(suffix, "%[(%d+)%-%d+%]")
+                    mod_suffix, num_matches = string.gsub(suffix, "(%[%d+%-%d+%])", first_img_num)
+                    assert(num_matches == 1, string.format("Malformed file path: %s", file_path))
+
+                    mod_clip_name, num_matches = string.gsub(clip_name, "(%[%d+%-%d+%])", first_img_num)
+                    assert(num_matches == 1, string.format("Malformed clip name: %s", clip_name))
+                else
+                    mod_suffix = suffix
+                    mod_clip_name = clip_name
+                end
+
+                new_fn = string.format("%s%s", new_prefix, mod_suffix)
+                new_dir = string.match(new_fn, string.format("^(.-)%s$", mod_clip_name:gsub('%W', function(x) return '%'..x end)))
 
                 if new_dir == nil then
                     -- Probably the file didn't match the old prefix or the new prefix.
@@ -62,8 +73,12 @@ function traverse_clips(mediaPool, folder, dry_run)
                     print("Relinking...")
                     local success = mediaPool:RelinkClips({clip}, new_dir)
                     assert(success, string.format("Could not relink clip '%s' to '%s'", file_path, new_dir))
+
+                    relinked_file_path = clip:GetClipProperty("File Path")
+                    print("Relinked file path: ", relinked_file_path)
+                    assert(string.match(relinked_file_path, string.format("^%s(.+)$", new_prefix:gsub('%W', function(x) return '%'..x end))) ~= nil, string.format("Relinked file path '%s' does not have correct prefix.", relinked_file_path))
                 else
-                    if not file_exists(new_fn) then
+                    if new_fn == nil or not file_exists(new_fn) then
                         print("Could not find file: ", new_fn)
                         table.insert(missing_files, new_fn)
                     else
@@ -186,6 +201,7 @@ if run_relink then
     assert (itm.SrcPrefix.PlainText ~= nil and itm.DstPrefix.PlainText ~= nil, "Found nil prefixes! Refusing to run.")
     old_prefix = itm.SrcPrefix.PlainText
     new_prefix = itm.DstPrefix.PlainText
+    print(string.format("Replacing '%s' with '%s'...", old_prefix, new_prefix))
     traverse_projects(projectManager, traverse_folders)
     print("Done!")
 end
