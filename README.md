@@ -9,6 +9,7 @@ Repository of scripts I've made for Fusion and DaVinci Resolve
     - [Debugging](#debugging)
 - [The Scripts](#the-scripts)
     - [Color](#color)
+        - [Export CDLs](#export-cdls)
     - [Comp](#comp)
     - [Edit](#edit)
     - [Deliver](#deliver)
@@ -41,6 +42,9 @@ If a script doesn't seem to do anything, go to `Workspace > Console` and make a 
 # The Scripts
 
 ## Color
+
+### Export CDLs
+With a relevant timeline open, run this script and specify a destination and CDLs will be written to that folder in the naming convention `<timeline name>_<clip number>.cdl`, where cip number starts at `001` and only counts clips in the first track. Check the Overwrite box to overwrite existing files.
 
 ## Comp
 
