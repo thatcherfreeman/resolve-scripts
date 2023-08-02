@@ -8,7 +8,45 @@ end
 function file_exists(name)
     local f=io.open(name,"r")
     if f~=nil then io.close(f) return true else return false end
- end
+end
+
+function lines_from(file)
+    if not file_exists(file) then return {} end
+    local lines = {}
+    for line in io.lines(file) do
+        lines[#lines + 1] = line
+    end
+    return lines
+end
+
+function write_cdl(fn, cdl, overwrite)
+    if overwrite == false then
+        if file_exists(fn) == true then
+            print(string.format("File %s already exists! skipping cdl...", fn))
+            return
+        end
+    end
+    cdl_content = string.format([[
+<?xml version="1.0" encoding="UTF-8"?>
+<ColorDecisionList xmlns="urn:ASC:CDL:v1.01">
+    <ColorDecision>
+        <ColorCorrection>
+            <SOPNode>
+                <Description>%s</Description>
+                <Slope>%s</Slope>
+                <Offset>%s</Offset>
+                <Power>%s</Power>
+            </SOPNode>
+            <SATNode>
+                <Saturation>%s</Saturation>
+            </SATNode>
+        </ColorCorrection>
+    </ColorDecision>
+</ColorDecisionList>]], cdl['description'], cdl['slope'], cdl['offset'], cdl['power'], cdl['sat'])
+    file = io.open(fn, 'w')
+    file:write(cdl_content)
+    file:close()
+end
 
 -- Draw window to get user parameters.
 local ui = fu.UIManager
@@ -67,18 +105,48 @@ if run_export then
     assert (itm.DstPath.PlainText ~= nil and itm.DstPath.PlainText ~= "", "Found empty destination path! Refusing to run")
     dstPath = itm.DstPath.PlainText
     overwrite = itm.overwriteFiles.Checked
-
-    M.path_separator = "/"
-    M.is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win32unix") == 1
-    if M.is_windows == true then
-        M.path_separator = "\\"
-    end
+    separator = package.config:sub(1,1)
 
     -- Make EDL via Export CDL button
     resolve = Resolve()
     projectManager = resolve:GetProjectManager()
     project = projectManager:GetCurrentProject()
     timeline = project:GetCurrentTimeline()
-    output_fn = string.format("%s%s%s", dstPath)
-    print(output_fn)
+    output_fn = string.format("%s%s%s.edl", dstPath, separator, timeline:GetName())
+    if overwrite == false and file_exists(output_fn) == true then
+        print("Won't overwrite file ", output_fn)
+        return
+    end
+    timeline:Export(output_fn, resolve.EXPORT_EDL, resolve.EXPORT_CDL)
+
+    local edl = lines_from(output_fn)
+    print_table(edl)
+
+    curr_cdl = {}
+    for i, line in pairs(edl) do
+        if string.match(line, "^(%d+)[%s%a]+.*$") ~= nil then
+            curr_cdl = {}
+            curr_cdl['name'] = string.match(line, "^(%d+)[%s%a]+.*$")
+            curr_cdl['description'] = string.format("Timeline %s Clip %s", timeline:GetName(), curr_cdl['name'])
+        elseif string.match(line, "^*ASC_SOP") ~= nil then
+            cols = {'slope', 'offset', 'power'}
+            index = 1
+            for nums in string.gmatch(line,"%(([%-%d%.]+%s[%-%d%.]+%s[%-%d%.]+)%)") do
+                assert(nums ~= nil, string.format("Couldn't parse nums from line: %s", line))
+                curr_cdl[cols[index]] = nums
+                index = index + 1
+            end
+        elseif string.match(line, "^%*ASC_SAT") ~= nil then
+            curr_cdl['sat'] = string.match(line, "([%-%.%d]+)")
+
+            -- This line is always last, so let's write it to a file.
+            cdl_fn = string.format("%s%s%s_%s.cdl", dstPath, separator, timeline:GetName(), curr_cdl['name'])
+            print(string.format("Writing clip %s to file %s", curr_cdl['name'], cdl_fn))
+            print_table(curr_cdl)
+            write_cdl(cdl_fn, curr_cdl, overwrite)
+        else
+            -- do nothing
+        end
+    end
+    print("Done!")
 end
