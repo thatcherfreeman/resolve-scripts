@@ -53,6 +53,12 @@ local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
 local width,height = 500,200
 
+local is_windows = package.config:sub(1,1) ~= "/"
+local placeholder_text = "/Users/yourname/Resolve Projects/"
+if is_windows == true then
+    placeholder_text = "C:/Users/yourname/Resolve Projects/"
+end
+
 win = disp:AddWindow({
     ID = 'MyWin',
     WindowTitle = 'Export CDLs',
@@ -63,7 +69,7 @@ win = disp:AddWindow({
         ui:HGroup{
             ID = 'dst',
             ui:Label{ID = 'DstLabel', Text = 'Location to write EDL and CDLs to:'},
-            ui:TextEdit{ID = 'DstPath', Text = '', PlaceholderText = '~/Desktop/',}
+            ui:TextEdit{ID = 'DstPath', Text = '', PlaceholderText = placeholder_text,}
         },
         ui:CheckBox{ID = 'overwriteFiles', Text = 'Overwrite Files'},
         ui:HGroup{
