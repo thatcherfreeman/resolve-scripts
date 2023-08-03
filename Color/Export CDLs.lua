@@ -11,11 +11,11 @@ function file_exists(name)
 end
 
 function remove_file_extension(fn)
-    res = string.match(fn, "^(.*)%..-$")
-    if res == nil then
+    local out = string.match(fn, "^(.+)%..-$")
+    if out == nil then
         return fn
     else
-        return res
+        return out
     end
 end
 
@@ -59,9 +59,11 @@ end
 
 function write_cdls(cdl_list, overwrite)
     for i, cdl in pairs(cdl_list) do
-        print(string.format("\nWriting CDL %s to %s.cdl", cdl["name"], cdl["fn"]))
-        print_table(cdl)
-        write_cdl(cdl, overwrite)
+        if cdl["skip"] == false then
+            print(string.format("\nWriting CDL %s to %s.cdl", cdl["name"], cdl["fn"]))
+            print_table(cdl)
+            write_cdl(cdl, overwrite)
+        end
     end
 end
 
@@ -91,9 +93,11 @@ end
 
 function write_ccs(cdl_list, overwrite)
     for i, cdl in pairs(cdl_list) do
-        print(string.format("\nWriting CC %s to %s.cc", cdl["name"], cdl["fn"]))
-        print_table(cdl)
-        write_cc(cdl, overwrite)
+        if cdl["skip"] == false then
+            print(string.format("\nWriting CC %s to %s.cc", cdl["name"], cdl["fn"]))
+            print_table(cdl)
+            write_cc(cdl, overwrite)
+        end
     end
 end
 
@@ -106,7 +110,9 @@ function write_ccc(cdl_list, fn, overwrite)
     end
     out = [[<ColorCorrectionCollection xmlns="urn:ASC:CDL:v1.2">]]
     for i, cdl in pairs(cdl_list) do
-        cc_content = string.format([[
+        if cdl["skip"] == false then
+            print_table(cdl)
+            cc_content = string.format([[
     <ColorCorrection id="%s">
         <SOPNode>
             <Slope>%s</Slope>
@@ -117,7 +123,8 @@ function write_ccc(cdl_list, fn, overwrite)
             <Saturation>%s</Saturation>
         </SatNode>
     </ColorCorrection>]], cdl["name"], cdl["slope"], cdl["offset"], cdl["power"], cdl["sat"])
-        out = out.."\n"..cc_content
+            out = out.."\n"..cc_content
+        end
     end
     out = out.."\n".."</ColorCorrectionCollection>"
     print("Writing to file: ", fn..".ccc")
@@ -135,7 +142,12 @@ function clip_id_to_name(timeline, separator)
     names = {}
     for i, item in pairs(timelineItems) do
         if i ~= "__flags" then
-            table.insert(names, i, remove_file_extension(item:GetMediaPoolItem():GetName()))
+            if item:GetMediaPoolItem() ~= nil then
+                name = remove_file_extension(item:GetMediaPoolItem():GetClipProperty("File Name"))
+            else
+                name = "NO_MEDIA_POOL_ITEM"
+            end
+            table.insert(names, i, name)
         end
     end
     print("\nClip Names:")
@@ -238,6 +250,7 @@ if run_export then
             edl_id = string.match(line, "^(%d+)[%s%a]+.*$")
             curr_cdl["name"] = clip_names[edl_id_to_num(edl_id)]
             curr_cdl["fn"] = string.format("%s%s%s", dstPath, separator, curr_cdl['name'])
+            curr_cdl["skip"] = (curr_cdl["name"] == "NO_MEDIA_POOL_ITEM")
         elseif string.match(line, "^*ASC_SOP") ~= nil then
             cols = {"slope", "offset", "power"}
             index = 1
@@ -264,6 +277,11 @@ if run_export then
         write_ccc(cdl_list, string.format("%s%s%s", dstPath, separator, timeline:GetName()), overwrite)
     else
         print("Unknown file type: ", itm.outputType.CurrentText)
+    end
+
+    if #cdl_list ~= #clip_names then
+        print(string.format("WARNING: Names extracted from Track 1 of the timeline do not match the clips found in the timeline EDL. Found %d clip names and the edl had %d entries.", #clip_names, #cdl_list))
+        print_table(clip_names)
     end
 
     print("Done!")
