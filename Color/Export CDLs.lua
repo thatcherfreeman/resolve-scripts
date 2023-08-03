@@ -10,6 +10,15 @@ function file_exists(name)
     if f~=nil then io.close(f) return true else return false end
 end
 
+function remove_file_extension(fn)
+    res = string.match(fn, "^(.*)%..-$")
+    if res == nil then
+        return fn
+    else
+        return res
+    end
+end
+
 function lines_from(file)
     if not file_exists(file) then return {} end
     local lines = {}
@@ -19,10 +28,10 @@ function lines_from(file)
     return lines
 end
 
-function write_cdl(fn, cdl, overwrite)
+function write_cdl(cdl, overwrite)
     if overwrite == false then
-        if file_exists(fn) == true then
-            print(string.format("File %s already exists! skipping cdl...", fn))
+        if file_exists(cdl["fn"]..".cdl") == true then
+            print(string.format("File %s already exists! Skipping cdl...", cdl["fn"]..".cdl"))
             return
         end
     end
@@ -42,10 +51,96 @@ function write_cdl(fn, cdl, overwrite)
             </SATNode>
         </ColorCorrection>
     </ColorDecision>
-</ColorDecisionList>]], cdl['description'], cdl['slope'], cdl['offset'], cdl['power'], cdl['sat'])
-    file = io.open(fn, 'w')
+</ColorDecisionList>]], cdl["name"], cdl["slope"], cdl["offset"], cdl["power"], cdl["sat"])
+    file = io.open(cdl["fn"]..".cdl", "w")
     file:write(cdl_content)
     file:close()
+end
+
+function write_cdls(cdl_list, overwrite)
+    for i, cdl in pairs(cdl_list) do
+        print(string.format("\nWriting CDL %s to %s.cdl", cdl["name"], cdl["fn"]))
+        print_table(cdl)
+        write_cdl(cdl, overwrite)
+    end
+end
+
+function write_cc(cdl, overwrite)
+    if overwrite == false then
+        if file_exists(cdl["fn"]..".cc") == true then
+            print(string.format("File %s already exists! Skipping cc...", cdl["fn"]..".cc"))
+            return
+        end
+    end
+    cc_content = string.format([[
+<?xml version="1.0" encoding="UTF-8"?>
+<ColorCorrection id="%s">
+    <SOPNode>
+        <Slope>%s</Slope>
+        <Offset>%s</Offset>
+        <Power>%s</Power>
+    </SOPNode>
+    <SatNode>
+        <Saturation>%s</Saturation>
+    </SatNode>
+</ColorCorrection>]], cdl["name"], cdl["slope"], cdl["offset"], cdl["power"], cdl["sat"])
+    file = io.open(cdl["fn"]..".cc", "w")
+    file:write(cc_content)
+    file:close()
+end
+
+function write_ccs(cdl_list, overwrite)
+    for i, cdl in pairs(cdl_list) do
+        print(string.format("\nWriting CC %s to %s.cc", cdl["name"], cdl["fn"]))
+        print_table(cdl)
+        write_cc(cdl, overwrite)
+    end
+end
+
+function write_ccc(cdl_list, fn, overwrite)
+    if overwrite == false then
+        if file_exists(fn..".ccc") == true then
+            print(string.format("File %s already exists! Skipping ccc...", fn..".ccc"))
+            return
+        end
+    end
+    out = [[<ColorCorrectionCollection xmlns="urn:ASC:CDL:v1.2">]]
+    for i, cdl in pairs(cdl_list) do
+        cc_content = string.format([[
+    <ColorCorrection id="%s">
+        <SOPNode>
+            <Slope>%s</Slope>
+            <Offset>%s</Offset>
+            <Power>%s</Power>
+        </SOPNode>
+        <SatNode>
+            <Saturation>%s</Saturation>
+        </SatNode>
+    </ColorCorrection>]], cdl["name"], cdl["slope"], cdl["offset"], cdl["power"], cdl["sat"])
+        out = out.."\n"..cc_content
+    end
+    out = out.."\n".."</ColorCorrectionCollection>"
+    print("Writing to file: ", fn..".ccc")
+    file = io.open(fn..".ccc", "w")
+    file:write(out)
+    file:close()
+end
+
+function edl_id_to_num(edl_id)
+    return tonumber(edl_id)
+end
+
+function clip_id_to_name(timeline, separator)
+    timelineItems = timeline:GetItemListInTrack("video", 1)
+    names = {}
+    for i, item in pairs(timelineItems) do
+        if i ~= "__flags" then
+            table.insert(names, i, remove_file_extension(item:GetMediaPoolItem():GetName()))
+        end
+    end
+    print("\nClip Names:")
+    print_table(names)
+    return names
 end
 
 -- Draw window to get user parameters.
@@ -60,22 +155,26 @@ if is_windows == true then
 end
 
 win = disp:AddWindow({
-    ID = 'MyWin',
-    WindowTitle = 'Export CDLs',
+    ID = "MyWin",
+    WindowTitle = "Export CDLs",
     Geometry = { 100, 100, width, height },
     Spacing = 10,
     ui:VGroup{
-        ID = 'root',
+        ID = "root",
         ui:HGroup{
-            ID = 'dst',
-            ui:Label{ID = 'DstLabel', Text = 'Location to write EDL and CDLs to:'},
-            ui:TextEdit{ID = 'DstPath', Text = '', PlaceholderText = placeholder_text,}
+            ID = "dst",
+            ui:Label{ID = "DstLabel", Text = "Location to write files to:"},
+            ui:TextEdit{ID = "DstPath", Text = "", PlaceholderText = placeholder_text,}
         },
-        ui:CheckBox{ID = 'overwriteFiles', Text = 'Overwrite Files'},
         ui:HGroup{
-            ID = 'buttons',
-            ui:Button{ID = 'cancelButton', Text = 'Cancel'},
-            ui:Button{ID = 'goButton', Text = 'Go'},
+            ui:Label{ID = "outputLabel", Text = "Output Format:"},
+            ui:ComboBox{ID = "outputType", Text = "Output Format"},
+        },
+        ui:CheckBox{ID = "overwriteFiles", Text = "Overwrite Color Files"},
+        ui:HGroup{
+            ID = "buttons",
+            ui:Button{ID = "cancelButton", Text = "Cancel"},
+            ui:Button{ID = "goButton", Text = "Go"},
         },
     },
 })
@@ -89,19 +188,22 @@ function win.On.MyWin.Close(ev)
 end
 
 function win.On.cancelButton.Clicked(ev)
-    print('Cancel Clicked')
+    print("Cancel Clicked")
     disp:ExitLoop()
     run_export = false
 end
 
 function win.On.goButton.Clicked(ev)
-    print('Go Clicked')
+    print("Go Clicked")
     disp:ExitLoop()
     run_export = true
 end
 
 -- Add your GUI element based event functions here:
 itm = win:GetItems()
+itm.outputType:AddItem('CDL')
+itm.outputType:AddItem('CC')
+itm.outputType:AddItem('CCC')
 
 win:Show()
 disp:RunLoop()
@@ -119,23 +221,25 @@ if run_export then
     project = projectManager:GetCurrentProject()
     timeline = project:GetCurrentTimeline()
     output_fn = string.format("%s%s%s.edl", dstPath, separator, timeline:GetName())
-    if overwrite == false and file_exists(output_fn) == true then
-        print("Won't overwrite file ", output_fn)
-        return
-    end
     timeline:Export(output_fn, resolve.EXPORT_EDL, resolve.EXPORT_CDL)
 
+    -- The EDL doesn't include clip names, so map from the ID to the clip name here.
+    clip_names = clip_id_to_name(timeline)
+
+    -- Parse the EDL file.
     local edl = lines_from(output_fn)
     print_table(edl)
 
+    cdl_list = {}
     curr_cdl = {}
     for i, line in pairs(edl) do
         if string.match(line, "^(%d+)[%s%a]+.*$") ~= nil then
             curr_cdl = {}
-            curr_cdl['name'] = string.match(line, "^(%d+)[%s%a]+.*$")
-            curr_cdl['description'] = string.format("Timeline %s Clip %s", timeline:GetName(), curr_cdl['name'])
+            edl_id = string.match(line, "^(%d+)[%s%a]+.*$")
+            curr_cdl["name"] = clip_names[edl_id_to_num(edl_id)]
+            curr_cdl["fn"] = string.format("%s%s%s", dstPath, separator, curr_cdl['name'])
         elseif string.match(line, "^*ASC_SOP") ~= nil then
-            cols = {'slope', 'offset', 'power'}
+            cols = {"slope", "offset", "power"}
             index = 1
             for nums in string.gmatch(line,"%(([%-%d%.]+%s[%-%d%.]+%s[%-%d%.]+)%)") do
                 assert(nums ~= nil, string.format("Couldn't parse nums from line: %s", line))
@@ -143,16 +247,24 @@ if run_export then
                 index = index + 1
             end
         elseif string.match(line, "^%*ASC_SAT") ~= nil then
-            curr_cdl['sat'] = string.match(line, "([%-%.%d]+)")
-
-            -- This line is always last, so let's write it to a file.
-            cdl_fn = string.format("%s%s%s_%s.cdl", dstPath, separator, timeline:GetName(), curr_cdl['name'])
-            print(string.format("Writing clip %s to file %s", curr_cdl['name'], cdl_fn))
-            print_table(curr_cdl)
-            write_cdl(cdl_fn, curr_cdl, overwrite)
+            curr_cdl["sat"] = string.match(line, "([%-%.%d]+)")
+            -- This line is always last, so let's save this CDL.
+            table.insert(cdl_list, curr_cdl)
         else
             -- do nothing
         end
     end
+
+    -- Write all CDLs to file(s)
+    if itm.outputType.CurrentText == "CDL" then
+        write_cdls(cdl_list, overwrite)
+    elseif itm.outputType.CurrentText == "CC" then
+        write_ccs(cdl_list, overwrite)
+    elseif itm.outputType.CurrentText == "CCC" then
+        write_ccc(cdl_list, string.format("%s%s%s", dstPath, separator, timeline:GetName()), overwrite)
+    else
+        print("Unknown file type: ", itm.outputType.CurrentText)
+    end
+
     print("Done!")
 end
