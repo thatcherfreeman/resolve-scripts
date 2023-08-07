@@ -137,13 +137,21 @@ function edl_id_to_num(edl_id)
     return tonumber(edl_id)
 end
 
-function clip_id_to_name(timeline, separator)
+function clip_id_to_name(timeline, attribute)
     timelineItems = timeline:GetItemListInTrack("video", 1)
     names = {}
     for i, item in pairs(timelineItems) do
         if i ~= "__flags" then
             if item:GetMediaPoolItem() ~= nil then
-                name = remove_file_extension(item:GetMediaPoolItem():GetClipProperty("File Name"))
+                if attribute == "Reel Name" then
+                    clipname = item:GetMediaPoolItem():GetClipProperty("Reel Name")
+                    if clipname == nil or clipname == "" then
+                        clipname = item:GetMediaPoolItem():GetClipProperty("File Name")
+                    end
+                elseif attribute == "File Name" then
+                    clipname = item:GetMediaPoolItem():GetClipProperty("File Name")
+                end
+                name = remove_file_extension(clipname)
             else
                 name = "NO_MEDIA_POOL_ITEM"
             end
@@ -182,6 +190,10 @@ win = disp:AddWindow({
             ui:Label{ID = "outputLabel", Text = "Output Format:"},
             ui:ComboBox{ID = "outputType", Text = "Output Format"},
         },
+        ui:HGroup{
+            ui:Label{ID = "outputFnLabel", Text = "Output File Name:"},
+            ui:ComboBox{ID = "outputFnType", Text = "Output File Name"},
+        },
         ui:CheckBox{ID = "overwriteFiles", Text = "Overwrite Color Files"},
         ui:HGroup{
             ID = "buttons",
@@ -216,6 +228,8 @@ itm = win:GetItems()
 itm.outputType:AddItem('CDL')
 itm.outputType:AddItem('CC')
 itm.outputType:AddItem('CCC')
+itm.outputFnType:AddItem('File Name')
+itm.outputFnType:AddItem('Reel Name')
 
 win:Show()
 disp:RunLoop()
@@ -236,7 +250,7 @@ if run_export then
     timeline:Export(output_fn, resolve.EXPORT_EDL, resolve.EXPORT_CDL)
 
     -- The EDL doesn't include clip names, so map from the ID to the clip name here.
-    clip_names = clip_id_to_name(timeline)
+    clip_names = clip_id_to_name(timeline, itm.outputFnType.CurrentText)
 
     -- Parse the EDL file.
     local edl = lines_from(output_fn)
