@@ -44,7 +44,9 @@ If a script doesn't seem to do anything, go to `Workspace > Console` and make a 
 ## Color
 
 ### Export CDLs
-With a relevant timeline open, run this script and specify a destination and CDLs will be written to that folder in the naming convention `<timeline name>_<clip number>.cdl`, where cip number starts at `001` and only counts clips in the first track. Check the Overwrite box to overwrite existing files.
+With a relevant timeline open, run this script and specify a destination directory. In that folder, the script will write CDL, CC, or CCC files. CDL or CC files will be titled by the file name or reel name of the clip, depending on what is specified before you hit Go. If the reel name could not be found, it will write with the clip's file name.
+
+The script goes through each clip in the timeline in the first track in order and generates a CDL, CC, or CCC file. If a file already exists, then the script will refuse to overwrite that file unless "Overwrite color files" is checked. I would not recommend running this on timelines that have Fusion compositions, compound clips, or duplicate clips/clips that have been split. I would also recommend running this with the console open just to see if there are any warnings and for an explanation of which clips were skipped, etc.
 
 ## Comp
 
