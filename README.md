@@ -54,7 +54,7 @@ The script goes through each clip in the timeline in the first track in order an
 ## Edit
 
 ### Generate All Clips Timeline
-Generates a timeline that contains all the video clips used in any timeline in your project, and their original media pool linked audio. Only takes the portion of each file from the first frame that is used in any timeline to the last frame used in any timeline, and everything between those two frames. Allows you to specify the name of the new timeline and whether you want to include disabled clips or not.
+Generates a timeline that contains all the video clips used in any timeline in your project, and their original media pool linked audio. Only takes the portion of each file from the first frame that is used in any timeline to the last frame used in any timeline, and everything between those two frames. Allows you to specify the name of the new timeline and whether you want to include disabled clips or not. Doesn't always work right when you have retimed clips.
 
 ## Deliver
 
