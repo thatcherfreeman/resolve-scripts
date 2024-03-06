@@ -69,10 +69,6 @@ function read_csv(csv)
     return output
 end
 
-function lerp(a,b,c)
-    return (((b) - (a)) * (c) + (a))
-end
-
 function cleanup_exif_tags(exif_tags)
     local output = exif_tags
     for k,v in pairs(exif_tags) do
@@ -101,6 +97,11 @@ end
 --
 -- Linear algebra functions
 --
+
+function lerp(a,b,c)
+    return (((b) - (a)) * (c) + (a))
+end
+
 function diagonal(vec)
     assert(type(vec) == "table" and #vec == 3, "diagonal() called on vec with incorrect size")
     local output = {
@@ -191,6 +192,27 @@ function multiply(mat1, mat2)
     return out
 end
 
+--
+-- Color Functions
+--
+
+D50_XY = {0.34567, 0.35850}
+D65_XY = {0.3127, 0.3290}
+
+ACES_AP0_PRIMARIES = {
+    red = {0.7347, 0.2653},
+    green = {0.0, 1.0},
+    blue = {0.0001, -0.0770},
+    white = {0.32168, 0.33767},
+}
+
+DWG_PRIMARIES = {
+    red = {0.800, 0.3130},
+    green = {0.1682, 0.9877},
+    blue = {0.0790, -0.1155},
+    white = D65_XY,
+}
+
 function xy_to_xyY(xy)
     assert(type(xy) == "table" and #xy == 2)
     local out = {xy[1], xy[2], 1.0}
@@ -236,11 +258,22 @@ function bradford_chromatic_adaptation(source_xy, destination_xy)
     return out
 end
 
+
+function get_XYZ_to_rgb_matrix(primaries)
+    -- Math taken from brucelindbloom.com
+    local red_XYZ = xyY_to_XYZ(xy_to_xyY(primaries.red))
+    local green_XYZ = xyY_to_XYZ(xy_to_xyY(primaries.green))
+    local blue_XYZ = xyY_to_XYZ(xy_to_xyY(primaries.blue))
+    local white_XYZ = xyY_to_XYZ(xy_to_xyY(primaries.white))
+    local xyzmat = {red_XYZ[1], green_XYZ[1], blue_XYZ[1], red_XYZ[2], green_XYZ[2], blue_XYZ[2], red_XYZ[3], green_XYZ[3], blue_XYZ[3]}
+    local srgb = multiply(inverse(xyzmat), white_XYZ)
+    local out = inverse(multiply(xyzmat, diagonal(srgb)))
+    return out
+end
+
 --
 -- Ports of DNG functions
 --
-D50_XY = {0.34567, 0.35850}
-D65_XY = {0.3127, 0.3290}
 
 function illuminant_to_temperature(illuminant)
     assert(type(illuminant) == "string")
@@ -456,8 +489,3 @@ print("Camera to XYZ D65: ")
 print_table(camera_to_xyz_d65)
 print("Camera to XYZ D65 with compensation for Resolve default white balance: ")
 print_table(multiply(camera_to_xyz_d65, diagonal(exif_tags['AsShotNeutral'])))
-
--- local handle = io.popen("/exiftool")
--- local result = handle:read("*a")
--- print(result)
--- handle:close()
