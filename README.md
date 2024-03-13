@@ -1,6 +1,8 @@
 # Resolve Scripts
 Repository of scripts I've made for Fusion and DaVinci Resolve
 
+Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymeacoffee.com/thatcherfreeman)
+
 ## Contents
 - [Resolve Scripts](#resolve-scripts)
     - [Contents](#contents)
