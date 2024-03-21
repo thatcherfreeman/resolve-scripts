@@ -83,55 +83,75 @@ if run_export then
     resolve = Resolve()
     projectManager = resolve:GetProjectManager()
     project = projectManager:GetCurrentProject()
-    num_timelines = project:GetTimelineCount()
     media_pool = project:GetMediaPool()
-    print(string.format("Found %d timelines", num_timelines))
+    num_timelines = project:GetTimelineCount()
+    selected_bin = media_pool:GetCurrentFolder()
 
     -- Iterate through timelines, figure out what clips we need and what frames are required.
     -- We'll make a table where the key is a clip identifier and the value is a clipinfo.
     local clips = {}
     local idx = 0
+
+    -- Mapping of timeline name to timeline object
+    project_timelines = {}
     for timeline_idx = 1, num_timelines do
-        curr_timeline = project:GetTimelineByIndex(timeline_idx)
-        num_tracks = curr_timeline:GetTrackCount("video")
-        for track_idx = 1, num_tracks do
-            track_items = curr_timeline:GetItemListInTrack("video", track_idx)
-            for _, track_item in pairs(track_items) do
-                if (track_item == nil or type(track_item) == "number") then
-                    print("Skipping ", track_item)
-                elseif allow_disabled_clips or track_item:GetClipEnabled() then
-                    -- Add clip and clipinfo to clips.
-                    if (track_item:GetMediaPoolItem() == nil) then
-                        print("could not retrieve media item for clip ", track_item:GetName())
-                    else
-                        media_item = track_item:GetMediaPoolItem()
-                        id = media_item:GetMediaId()
-                        local start_frame = track_item:GetLeftOffset()
-                        local end_frame = track_item:GetRightOffset() - 1
-                        if clips[id] ~= nil then
-                            start_frame = math.min(clips[id].clip_info.startFrame, start_frame)
-                            end_frame = math.max(clips[id].clip_info.endFrame, end_frame)
-                            clip_idx = clips[id].idx
+        runner_timeline = project:GetTimelineByIndex(timeline_idx)
+        project_timelines[runner_timeline:GetName()] = runner_timeline
+    end
+
+    -- Iterate through timelines in the current folder.
+    for _, media_pool_item in pairs(selected_bin:GetClipList()) do
+        -- Check if it's a timeline
+        if type(media_pool_item) == nil or type(media_pool_item) == "number" then
+            print("Skipping", media_pool_item)
+        elseif media_pool_item:GetClipProperty("Type") == "Timeline" then
+            desired_timeline_name = media_pool_item:GetName()
+            curr_timeline = project_timelines[desired_timeline_name]
+
+            num_tracks = curr_timeline:GetTrackCount("video")
+            for track_idx = 1, num_tracks do
+                track_items = curr_timeline:GetItemListInTrack("video", track_idx)
+                for _, track_item in pairs(track_items) do
+                    if (track_item == nil or type(track_item) == "number") then
+                        print("Skipping ", track_item)
+                    elseif allow_disabled_clips or track_item:GetClipEnabled() then
+                        -- Add clip and clipinfo to clips.
+                        if (track_item:GetMediaPoolItem() == nil) then
+                            print("could not retrieve media item for clip ", track_item:GetName())
                         else
-                            idx = idx + 1
-                            clip_idx = idx
-                        end
-                        print("leftoffset ", track_item:GetLeftOffset())
-                        print("duration ", track_item:GetDuration())
-                        print("rightoffset ", track_item:GetRightOffset())
-                        clips[id] = {
-                            idx = clip_idx,
-                            clip_info = {
-                                mediaPoolItem = media_item,
-                                startFrame = start_frame,
-                                endFrame = end_frame,
+                            media_item = track_item:GetMediaPoolItem()
+                            id = media_item:GetMediaId()
+                            local start_frame = track_item:GetLeftOffset()
+                            local end_frame = track_item:GetRightOffset() - 1
+                            if clips[id] ~= nil then
+                                start_frame = math.min(clips[id].clip_info.startFrame, start_frame)
+                                end_frame = math.max(clips[id].clip_info.endFrame, end_frame)
+                                clip_idx = clips[id].idx
+                            else
+                                idx = idx + 1
+                                clip_idx = idx
+                            end
+                            print("leftoffset ", track_item:GetLeftOffset())
+                            print("duration ", track_item:GetDuration())
+                            print("rightoffset ", track_item:GetRightOffset())
+                            clips[id] = {
+                                idx = clip_idx,
+                                clip_info = {
+                                    mediaPoolItem = media_item,
+                                    startFrame = start_frame,
+                                    endFrame = end_frame,
+                                }
                             }
-                        }
+                        end
                     end
                 end
             end
         end
     end
+
+
+
+
     clip_items = {}
     for _, clip_item in pairs(clips) do
         clip_items[clip_item.idx] = clip_item.clip_info
