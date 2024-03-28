@@ -15,6 +15,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
     - [Comp](#comp)
     - [Edit](#edit)
         - [Generate All Clips Timeline](#generate-all-clips-timeline)
+        - [Rename Timelines](#rename-timelines)
     - [Deliver](#deliver)
     - [Utility](#utility)
         - [Relink Media Pool Clips](#relink-media-pool-clips)
@@ -57,6 +58,9 @@ The script goes through each clip in the timeline in the first track in order an
 
 ### Generate All Clips Timeline
 Generates a timeline that contains all the video clips used in any timeline in your project, and their original media pool linked audio. Only takes the portion of each file from the first frame that is used in any timeline to the last frame used in any timeline, and everything between those two frames. Allows you to specify the name of the new timeline and whether you want to include disabled clips or not. Doesn't always work right when you have retimed clips.
+
+### Rename Timelines
+Find and replace timeline names within the current bin.
 
 ## Deliver
 
