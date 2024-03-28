@@ -91,11 +91,6 @@ if run_export then
     num_timelines = project:GetTimelineCount()
     selected_bin = media_pool:GetCurrentFolder()
 
-    -- Iterate through timelines, figure out what clips we need and what frames are required.
-    -- We'll make a table where the key is a clip identifier and the value is a clipinfo.
-    local clips = {}
-    local idx = 0
-
     -- Mapping of timeline name to timeline object
     project_timelines = {}
     for timeline_idx = 1, num_timelines do
