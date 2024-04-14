@@ -159,18 +159,18 @@ The element's ID is used to find, manage, and dispatch events for that element. 
 	Icon: 		File
 	TabBar:		CurrentIndex, TabsClosable, Expanding, AutoHide, Movable, DrawBase, UsesScrollButtons, DocumentMode, ChangeCurrentOnDrag
 	Tree:		ColumnCount, SortingEnabled, ItemsExpandable, ExpandsOnDoubleClick, AutoExpandDelay, HeaderHidden, IconSize, RootIsDecorated,
-				Animated, AllColumnsShowFocus, WordWrap, TreePosition, SelectionBehavior, SelectionMode, UniformRowHeights, Indentation, 
+				Animated, AllColumnsShowFocus, WordWrap, TreePosition, SelectionBehavior, SelectionMode, UniformRowHeights, Indentation,
 				VerticalScrollMode, HorizontalScrollMode, AutoScroll, AutoScrollMargin, TabKeyNavigation, AlternatingRowColors,
 				FrameStyle, LineWidth, MidLineWidth, FrameRect, FrameShape, FrameShadow
 	TreeItem:	Selected, Hidden, Expanded, Disabled, FirstColumnSpanned, Flags, ChildIndicatorPolicy
-	
+
 Some elements also have property arrays, indexed by item or column (zero-based), e.g. newItem.Text[2] = 'Third column text'
 
 	Combo:		ItemText[]
 	TabBar:		TabText[], TabToolTip[], TabWhatsThis[], TabTextColor[]
 	Tree:		ColumnWidth[]
 	Treeitem: 	Text[], StatusTip[], ToolTip[], WhatsThis[], SizeHint[], TextAlignment[], CheckState[], BackgroundColor[], TextColor[], Icon[], Font[]
-	
+
 Some elements like Label and Button will automatically recognise and render basic HTML in their Text attributes, and TextEdit is capable of displaying and returning HTML too. Element attributes can be specified when creating the element, or can be read or changed later:
 
 	win.Find('myButton').Text = "Processing..."
@@ -213,15 +213,15 @@ Some elements have extra functions of their own:
 	Slider:				SetRange(int, int), TriggerAction(string)
 	LineEdit:			SetSelection(int, int), bool HasSelectedText(), string SelectedText(), int SelectionStart(), SelectAll(), Clear(), Cut(), Copy(), Paste(),
 						Undo(), Redo(), Deselect(), Insert(string), Backspace(), Del(), Home(bool), End(bool), int CursorPositionAt(point)
-	TextEdit:			InsertPlainText(string), InsertHTML(string), Append(string), SelectAll(), Clear(), Cut(), Copy(), Paste(), Undo(), Redo(), 
+	TextEdit:			InsertPlainText(string), InsertHTML(string), Append(string), SelectAll(), Clear(), Cut(), Copy(), Paste(), Undo(), Redo(),
 						ScrollToAnchor(string), ZoomIn(int), ZoomOut(int), EnsureCursorVisible(), MoveCursor(moveOperation, moveMode), bool CanPaste(),
 						string AnchorAt(point), bool Find(string, findFlags)
 	TabBar:				int AddTab(strubg), int InsertTab(string), int Count(), RemoveTab(int), MoveTab(int, int)
 	Tree:				AddTopLevelItem(item), InsertTopLevelItem(item), SetHeaderLabel(string), int CurrentColumn(), int SortColumn(),
 						int TopLevelItemCount(), item CurrentItem(), item TopLevelItem(int), item TakeTopLevelItem(int), item InvisibleRootItem(),
-						item HeaderItem(), int IndexOfTopLevelItem(item), item ItemAbove(item), item ItemBelow(item), item ItemAt(point), 
+						item HeaderItem(), int IndexOfTopLevelItem(item), item ItemAbove(item), item ItemBelow(item), item ItemAt(point),
 						Clear(), rect VisualItemRect(item), SetHeaderLabels(list), SetHeaderItem(item), InsertTopLevelItems(list), AddTopLevelItems(list),
-						list SelectedItems(), list FindItems(string, flags), SortItems(int, order), ScrollToItem(item), ResetIndentation(), 
+						list SelectedItems(), list FindItems(string, flags), SortItems(int, order), ScrollToItem(item), ResetIndentation(),
 						SortByColumn(int, order), int FrameWidth()
 	TreeItem:			AddChild(item), InsertChild(item), RemoveChild(iitem), SortChildren(int, order), InsertChildren(int, list), AddChildren(list),
 						int IndexOfChild(item), item Clone(), tree TreeWidget(), item Parent(), item Child(int), item TakeChild(int),
@@ -237,7 +237,7 @@ Additionally, elements can be nested to define layout, using the HGroup and VGro
 
 	winLayout = ui.VGroup([
 		ui.Label({ 'Text': "A 2x2 grid of buttons", 'Weight': 1 }),
-		
+
 		ui.HGroup({ 'Weight': 5 }, [
 			ui.Button({ 'ID': "myButton1",  'Text': "Go" }),
 			ui.Button({ 'ID': "myButton2",  'Text': "Stop" }),
@@ -276,7 +276,7 @@ Many objects have specific events that can be handled:
 	TextEdit:			TextChanged, SelectionChanged, CursorPositionChanged
 	ColorPicker:		ColorChanged
 	TabBar:				CurrentChanged, CloseRequested, TabMoved, TabBarClicked, TabBarDoubleClicked
-	Tree:				CurrentItemChanged, ItemClicked, ItemPressed, ItemActivated, ItemDoubleClicked, ItemChanged, ItemEntered, 
+	Tree:				CurrentItemChanged, ItemClicked, ItemPressed, ItemActivated, ItemDoubleClicked, ItemChanged, ItemEntered,
 						ItemExpanded, ItemCollapsed, CurrentItemChanged, ItemSelectionChanged
 	Window:				Close, Show, Hide, Resize, MousePress, MouseRelease, MouseDoubleClick, MouseMove, Wheel, KeyPress, KeyRelease,
 						FocusIn, FocusOut, ContextMenu, Enter, Leave
@@ -284,8 +284,8 @@ Many objects have specific events that can be handled:
 Event handler functions are called with a dictionary of related attributes such as who, what, when, sender, and modifiers. Common events and some additional attributes they receive include:
 
 	MousePress:			Pos, GlobalPos, Button, Buttons
-	MouseRelease:		Pos, GlobalPos, Button, Buttons 
-	MouseDoubleClick:	Pos, GlobalPos, Button, Buttons 
+	MouseRelease:		Pos, GlobalPos, Button, Buttons
+	MouseDoubleClick:	Pos, GlobalPos, Button, Buttons
 	MouseMove:			Pos, GlobalPos, Button, Buttons
 	Wheel:				Pos, GlobalPos, Buttons, Delta, PixelDelta, AngleDelta, Orientiation, Phase
 	KeyPress:			Key, Text, IsAutoRepeat, Count
@@ -298,7 +298,7 @@ Event handler functions are called with a dictionary of related attributes such 
 Event handlers can be enabled or disabled for a given element by turning them on or off in the Events attribute:
 
 	ui.Slider({ 'ID': 'mySlider', 'Events': { 'SliderMoved': true } })
-	
+
 Some common events like Clicked or Close are enabled by default.
 
 Basic Resolve API
