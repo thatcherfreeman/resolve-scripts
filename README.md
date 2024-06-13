@@ -10,6 +10,8 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
     - [Running](#running)
     - [Debugging](#debugging)
 - [The Scripts](#the-scripts)
+    - [Coding](#coding)
+        - [Get Scripting Properties](#get-scripting-properties)
     - [Color](#color)
         - [Export CDLs](#export-cdls)
     - [Comp](#comp)
@@ -44,6 +46,10 @@ Run a script by navigating to `Workspace > Scripts > Your Script Name`, once you
 If a script doesn't seem to do anything, go to `Workspace > Console` and make a Github issue including anything you see in the console.
 
 # The Scripts
+
+## Coding
+### Get Scripting Properties
+Prints to the console the project/Timeline/Clip/MediaItem settings for reference.
 
 ## Color
 
