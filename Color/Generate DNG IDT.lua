@@ -489,3 +489,7 @@ print("Camera to XYZ D65: ")
 print_table(camera_to_xyz_d65)
 print("Camera to XYZ D65 with compensation for Resolve default white balance: ")
 print_table(multiply(camera_to_xyz_d65, diagonal(exif_tags['AsShotNeutral'])))
+
+local camera_to_dwg = multiply(get_XYZ_to_rgb_matrix(DWG_PRIMARIES), multiply(camera_to_xyz_d65, diagonal(exif_tags['AsShotNeutral'])))
+print("Camera to DWG: ")
+print_table(camera_to_dwg)
