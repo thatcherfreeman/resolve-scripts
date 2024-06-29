@@ -1,4 +1,4 @@
-Last Updated: 10 May 2024
+Last Updated: 31 May 2024
 ----------------------------
 In this package, you will find a brief introduction to the Scripting API for DaVinci Resolve Studio. Apart from this README.txt file, this package contains folders containing the basic import
 modules for scripting access (DaVinciResolve.py) and some representative examples.
@@ -428,7 +428,7 @@ TimelineItem
   DeleteTakeByIndex(idx)                          --> Bool               # Deletes a take by index, 1 <= idx <= number of takes.
   SelectTakeByIndex(idx)                          --> Bool               # Selects a take by index, 1 <= idx <= number of takes.
   FinalizeTake()                                  --> Bool               # Finalizes take selection.
-  CopyGrades([tgtTimelineItems])                  --> Bool               # Copies the current grade to all the items in tgtTimelineItems list. Returns True on success and False if any error occurred.
+  CopyGrades([tgtTimelineItems])                  --> Bool               # Copies the current node stack layer grade to the same layer for each item in tgtTimelineItems. Returns True if successful.
   SetClipEnabled(Bool)                            --> Bool               # Sets clip enabled based on argument.
   GetClipEnabled()                                --> Bool               # Gets clip enabled status.
   UpdateSidecar()                                 --> Bool               # Updates sidecar file for BRAW clips or RMD file for R3D clips.
@@ -438,7 +438,7 @@ TimelineItem
   RegenerateMagicMask()                           --> Bool               # Returns True if magic mask was regenerated successfully, False otherwise.
   Stabilize()                                     --> Bool               # Returns True if stabilization was successful, False otherwise
   SmartReframe()                                  --> Bool               # Performs Smart Reframe. Returns True if successful, False otherwise.
-  GetNodeGraph()                                  --> Graph              # Returns the clip's node graph object.
+  GetNodeGraph(layerIdx)                          --> Graph              # Returns the clip's node graph object at layerIdx (int, optional). Returns the first layer if layerIdx is skipped. 1 <= layerIdx <= project.GetSetting("nodeStackLayers").
   GetColorGroup()                                 --> ColorGroup         # Returns the clip's color group if one exists.
   AssignToColorGroup(ColorGroup)                  --> Bool               # Returns True if TiItem to successfully assigned to given ColorGroup. ColorGroup must be an existing group in the current project.
   RemoveFromColorGroup()                          --> Bool               # Returns True if the TiItem is successfully removed from the ColorGroup it is in.
