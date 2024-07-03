@@ -28,7 +28,7 @@ local is_windows = package.config:sub(1,1) ~= "/"
 
 win = disp:AddWindow({
     ID = "MyWin",
-    WindowTitle = "Generate All Clips Timeline",
+    WindowTitle = "Rename Timelines",
     Geometry = { 100, 100, width, height },
     Spacing = 10,
     ui:VGroup{
