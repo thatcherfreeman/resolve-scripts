@@ -9,6 +9,7 @@ function print_table(t, indentation)
     end
     local outer_prefix = string.rep("    ", indentation)
     local inner_prefix = string.rep("    ", indentation + 1)
+    table.sort(t)
     print(outer_prefix, "{")
     for k, v in pairs(t) do
         if type(v) == "table" then
