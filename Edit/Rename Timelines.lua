@@ -50,35 +50,22 @@ win = disp:AddWindow({
         },
     },
 })
-
-run_export = false
+-- Add your GUI element based event functions here:
+itm = win:GetItems()
 
 -- The window was closed
 function win.On.MyWin.Close(ev)
     disp:ExitLoop()
-    run_export = false
 end
 
 function win.On.cancelButton.Clicked(ev)
     print("Cancel Clicked")
     disp:ExitLoop()
-    run_export = false
 end
 
 function win.On.goButton.Clicked(ev)
     print("Go Clicked")
-    disp:ExitLoop()
-    run_export = true
-end
-
--- Add your GUI element based event functions here:
-itm = win:GetItems()
-
-win:Show()
-disp:RunLoop()
-win:Hide()
-
-if run_export then
+    -- disp:ExitLoop()
     assert(itm.FindText.PlainText ~= nil and itm.FindText.PlainText ~= "", "Found empty New Timeline Name! Refusing to run")
     find_text = itm.FindText.PlainText
     replace_text = itm.ReplaceText.PlainText
@@ -115,3 +102,7 @@ if run_export then
 
     print("Done!")
 end
+
+win:Show()
+disp:RunLoop()
+win:Hide()
