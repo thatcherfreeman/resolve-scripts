@@ -18,37 +18,56 @@ function print_table(t, indentation)
     print(outer_prefix, "}")
 end
 
-
 -- Draw window to get user parameters.
 local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
-local width,height = 500,200
+local width, height = 500, 200
 
-local is_windows = package.config:sub(1,1) ~= "/"
+local is_windows = package.config:sub(1, 1) ~= "/"
 
 win = disp:AddWindow({
     ID = "MyWin",
-    WindowTitle = "Rename Timelines",
-    Geometry = { 100, 100, width, height },
+    WindowTitle = "Rename Clips",
+    Geometry = {100, 100, width, height},
     Spacing = 10,
     ui:VGroup{
         ID = "root",
         ui:HGroup{
             ID = "dst",
-            ui:Label{ID = "FindLabel", Text = "Find String"},
-            ui:TextEdit{ID = "FindText", Text = "", PlaceholderText = "find",}
+            ui:Label{
+                ID = "FindLabel",
+                Text = "Find String"
+            },
+            ui:TextEdit{
+                ID = "FindText",
+                Text = "",
+                PlaceholderText = "find"
+            }
         },
         ui:HGroup{
             ID = "dst",
-            ui:Label{ID = "ReplaceLabel", Text = "Replace String"},
-            ui:TextEdit{ID = "ReplaceText", Text = "", PlaceholderText = "replace",}
+            ui:Label{
+                ID = "ReplaceLabel",
+                Text = "Replace String"
+            },
+            ui:TextEdit{
+                ID = "ReplaceText",
+                Text = "",
+                PlaceholderText = "replace"
+            }
         },
         ui:HGroup{
             ID = "buttons",
-            ui:Button{ID = "cancelButton", Text = "Cancel"},
-            ui:Button{ID = "goButton", Text = "Replace"},
-        },
-    },
+            ui:Button{
+                ID = "cancelButton",
+                Text = "Cancel"
+            },
+            ui:Button{
+                ID = "goButton",
+                Text = "Replace"
+            }
+        }
+    }
 })
 -- Add your GUI element based event functions here:
 itm = win:GetItems()
@@ -66,11 +85,12 @@ end
 function win.On.goButton.Clicked(ev)
     print("Go Clicked")
     -- disp:ExitLoop()
-    assert(itm.FindText.PlainText ~= nil and itm.FindText.PlainText ~= "", "Found empty New Timeline Name! Refusing to run")
+    assert(itm.FindText.PlainText ~= nil and itm.FindText.PlainText ~= "",
+        "Found empty New Timeline Name! Refusing to run")
     find_text = itm.FindText.PlainText
     replace_text = itm.ReplaceText.PlainText
 
-    -- Get timelines
+    -- Get clips in current bin
     resolve = Resolve()
     projectManager = resolve:GetProjectManager()
     project = projectManager:GetCurrentProject()
@@ -78,26 +98,17 @@ function win.On.goButton.Clicked(ev)
     num_timelines = project:GetTimelineCount()
     selected_bin = media_pool:GetCurrentFolder()
 
-    -- Mapping of timeline name to timeline object
-    project_timelines = {}
-    for timeline_idx = 1, num_timelines do
-        runner_timeline = project:GetTimelineByIndex(timeline_idx)
-        project_timelines[runner_timeline:GetName()] = runner_timeline
-    end
-
-     -- Iterate through timelines in the current folder.
-     for _, media_pool_item in pairs(selected_bin:GetClipList()) do
+    -- Iterate through timelines in the current folder.
+    for _, media_pool_item in pairs(selected_bin:GetClipList()) do
         -- Check if it's a timeline
         if type(media_pool_item) == nil or type(media_pool_item) == "number" then
             print("Skipping", media_pool_item)
-        elseif media_pool_item:GetClipProperty("Type") == "Timeline" then
-            desired_timeline_name = media_pool_item:GetName()
-            curr_timeline = project_timelines[desired_timeline_name]
-            curr_name = curr_timeline:GetName()
-            new_name = string.gsub(curr_name, find_text, replace_text)
-            if curr_name ~= new_name then
-                curr_timeline:SetName(new_name)
-                print("Renaming Timeline: ", curr_name, " --> ", new_name)
+        elseif media_pool_item:GetClipProperty("Type") ~= "Timeline" then
+            curr_item_name = media_pool_item:GetClipProperty("Clip Name")
+            new_name = string.gsub(curr_item_name, find_text, replace_text)
+            if curr_item_name ~= new_name then
+                media_pool_item:SetClipProperty("Clip Name", new_name)
+                print("Renaming Clip: ", curr_item_name, " --> ", new_name)
             end
         end
     end
