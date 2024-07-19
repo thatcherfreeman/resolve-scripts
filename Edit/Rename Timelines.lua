@@ -18,37 +18,56 @@ function print_table(t, indentation)
     print(outer_prefix, "}")
 end
 
-
 -- Draw window to get user parameters.
 local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
-local width,height = 500,200
+local width, height = 500, 200
 
-local is_windows = package.config:sub(1,1) ~= "/"
+local is_windows = package.config:sub(1, 1) ~= "/"
 
 win = disp:AddWindow({
     ID = "MyWin",
     WindowTitle = "Rename Timelines",
-    Geometry = { 100, 100, width, height },
+    Geometry = {100, 100, width, height},
     Spacing = 10,
     ui:VGroup{
         ID = "root",
         ui:HGroup{
             ID = "dst",
-            ui:Label{ID = "FindLabel", Text = "Find String"},
-            ui:TextEdit{ID = "FindText", Text = "", PlaceholderText = "find",}
+            ui:Label{
+                ID = "FindLabel",
+                Text = "Find String"
+            },
+            ui:TextEdit{
+                ID = "FindText",
+                Text = "",
+                PlaceholderText = "find"
+            }
         },
         ui:HGroup{
             ID = "dst",
-            ui:Label{ID = "ReplaceLabel", Text = "Replace String"},
-            ui:TextEdit{ID = "ReplaceText", Text = "", PlaceholderText = "replace",}
+            ui:Label{
+                ID = "ReplaceLabel",
+                Text = "Replace String"
+            },
+            ui:TextEdit{
+                ID = "ReplaceText",
+                Text = "",
+                PlaceholderText = "replace"
+            }
         },
         ui:HGroup{
             ID = "buttons",
-            ui:Button{ID = "cancelButton", Text = "Cancel"},
-            ui:Button{ID = "goButton", Text = "Replace"},
-        },
-    },
+            ui:Button{
+                ID = "cancelButton",
+                Text = "Cancel"
+            },
+            ui:Button{
+                ID = "goButton",
+                Text = "Replace"
+            }
+        }
+    }
 })
 -- Add your GUI element based event functions here:
 itm = win:GetItems()
@@ -66,7 +85,8 @@ end
 function win.On.goButton.Clicked(ev)
     print("Go Clicked")
     -- disp:ExitLoop()
-    assert(itm.FindText.PlainText ~= nil and itm.FindText.PlainText ~= "", "Found empty New Timeline Name! Refusing to run")
+    assert(itm.FindText.PlainText ~= nil and itm.FindText.PlainText ~= "",
+        "Found empty New Timeline Name! Refusing to run")
     find_text = itm.FindText.PlainText
     replace_text = itm.ReplaceText.PlainText
 
@@ -85,8 +105,8 @@ function win.On.goButton.Clicked(ev)
         project_timelines[runner_timeline:GetName()] = runner_timeline
     end
 
-     -- Iterate through timelines in the current folder.
-     for _, media_pool_item in pairs(selected_bin:GetClipList()) do
+    -- Iterate through timelines in the current folder.
+    for _, media_pool_item in pairs(selected_bin:GetClipList()) do
         -- Check if it's a timeline
         if type(media_pool_item) == nil or type(media_pool_item) == "number" then
             print("Skipping", media_pool_item)
