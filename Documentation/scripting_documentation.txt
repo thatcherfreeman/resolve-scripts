@@ -1,4 +1,4 @@
-Last Updated: 16 July 2024
+Last Updated: 20 September 2024
 ----------------------------
 In this package, you will find a brief introduction to the Scripting API for DaVinci Resolve Studio. Apart from this README.txt file, this package contains folders containing the basic import
 modules for scripting access (DaVinciResolve.py) and some representative examples.
@@ -208,10 +208,10 @@ MediaPool
   CreateEmptyTimeline(name)                       --> Timeline           # Adds new timeline with given name.
   AppendToTimeline(clip1, clip2, ...)             --> [TimelineItem]     # Appends specified MediaPoolItem objects in the current timeline. Returns the list of appended timelineItems.
   AppendToTimeline([clips])                       --> [TimelineItem]     # Appends specified MediaPoolItem objects in the current timeline. Returns the list of appended timelineItems.
-  AppendToTimeline([{clipInfo}, ...])             --> [TimelineItem]     # Appends list of clipInfos specified as dict of "mediaPoolItem", "startFrame" (int), "endFrame" (int), (optional) "mediaType" (int; 1 - Video only, 2 - Audio only), "trackIndex" (int) and "recordFrame" (int). Returns the list of appended timelineItems.
+  AppendToTimeline([{clipInfo}, ...])             --> [TimelineItem]     # Appends list of clipInfos specified as dict of "mediaPoolItem", "startFrame" (int), "endFrame" (int), (optional) "mediaType" (int; 1 - Video only, 2 - Audio only), "trackIndex" (int) and "recordFrame" (int/float). Returns the list of appended timelineItems.
   CreateTimelineFromClips(name, clip1, clip2,...) --> Timeline           # Creates new timeline with specified name, and appends the specified MediaPoolItem objects.
   CreateTimelineFromClips(name, [clips])          --> Timeline           # Creates new timeline with specified name, and appends the specified MediaPoolItem objects.
-  CreateTimelineFromClips(name, [{clipInfo}])     --> Timeline           # Creates new timeline with specified name, appending the list of clipInfos specified as a dict of "mediaPoolItem", "startFrame" (int), "endFrame" (int), "recordFrame" (int).
+  CreateTimelineFromClips(name, [{clipInfo}])     --> Timeline           # Creates new timeline with specified name, appending the list of clipInfos specified as a dict of "mediaPoolItem", "startFrame" (int), "endFrame" (int), "recordFrame" (int/float).
   ImportTimelineFromFile(filePath, {importOptions}) --> Timeline         # Creates timeline based on parameters within given file (AAF/EDL/XML/FCPXML/DRT/ADL/OTIO) and optional importOptions dict, with support for the keys:
                                                                          # "timelineName": string, specifies the name of the timeline to be created. Not valid for DRT import
                                                                          # "importSourceClips": Bool, specifies whether source clips should be imported, True by default. Not valid for DRT import
@@ -241,6 +241,8 @@ MediaPool
   GetUniqueId()                                   --> string             # Returns a unique ID for the media pool
   CreateStereoClip(LeftMediaPoolItem,
                    RightMediaPoolItem)            --> MediaPoolItem      # Takes in two existing media pool items and creates a new 3D stereoscopic media pool entry replacing the input media in the media pool.
+  GetSelectedClips()                              --> [MediaPoolItems]   # Returns the current selected MediaPoolItems
+  SetSelectedClip(MediaPoolItem)                  --> Bool               # Sets the selected MediaPoolItem to the given MediaPoolItem
 
 Folder
   GetClipList()                                   --> [clips...]         # Returns a list of clips (items) within the folder.
@@ -258,6 +260,10 @@ MediaPoolItem
                                                                          # If no argument is specified, a dict of all set metadata properties is returned.
   SetMetadata(metadataType, metadataValue)        --> Bool               # Sets the given metadata to metadataValue (string). Returns True if successful.
   SetMetadata({metadata})                         --> Bool               # Sets the item metadata with specified 'metadata' dict. Returns True if successful.
+  GetThirdPartyMetadata(metadataType=None)        --> string|dict        # Returns the third party metadata value for the key 'metadataType'.
+                                                                         # If no argument is specified, a dict of all set third parth metadata properties is returned.
+  SetThirdPartyMetadata(metadataType, metadataValue) --> Bool            # Sets/Add the given third party metadata to metadataValue (string). Returns True if successful.
+  SetThirdPartyMetadata({metadata})               --> Bool               # Sets/Add the item third party metadata with specified 'metadata' dict. Returns True if successful.
   GetMediaId()                                    --> string             # Returns the unique ID for the MediaPoolItem.
   AddMarker(frameId, color, name, note, duration, --> Bool               # Creates a new marker at given frameId position and with given marker information. 'customData' is optional and helps to attach user specific data to the marker.
             customData)
@@ -303,6 +309,10 @@ Timeline
                                                                          # 'audiotype' defaults to 'mono' if arg skipped and track type is ‘audio’.
                                                                          # 'index' if skipped (or if value not in bounds) appends track.
   DeleteTrack(trackType, trackIndex)              --> Bool               # Deletes track of trackType ("video", "subtitle", "audio") and given trackIndex. 1 <= trackIndex <= GetTrackCount(trackType).
+  GetTrackSubType(trackType, trackIndex)          --> string             # Returns an audio track's format.
+                                                                         # the return value is one of {"mono", "stereo", "5.1", "5.1film", "7.1", "7.1film", "adaptive1", ... , "adaptive24"} and matches the parameters 'subTrackType' and 'audioType' in timeline.AddTrack.
+                                                                         # returns a blank string for non audio tracks
+
   SetTrackEnable(trackType, trackIndex, Bool)     --> Bool               # Enables/Disables track with given trackType and trackIndex
                                                                          # trackType is one of {"audio", "video", "subtitle"}
                                                                          # 1 <= trackIndex <= GetTrackCount(trackType).
@@ -376,15 +386,19 @@ Timeline
 
 TimelineItem
   GetName()                                       --> string             # Returns the item name.
-  GetDuration()                                   --> int                # Returns the item duration.
-  GetEnd()                                        --> int                # Returns the end frame position on the timeline.
+  GetDuration(subframe_precision)                 --> int/float          # Returns the item duration. Returns fractional frames if subframe_precision is True
+  GetEnd(subframe_precision)                      --> int/float          # Returns the end frame position on the timeline. Returns fractional frames if subframe_precision is True
+  GetSourceEndFrame()                             --> int                # Returns the end frame position of the media pool clip in the timeline clip.
+  GetSourceEndTime()                              --> float              # Returns the end time position of the media pool clip in the timeline clip.
   GetFusionCompCount()                            --> int                # Returns number of Fusion compositions associated with the timeline item.
   GetFusionCompByIndex(compIndex)                 --> fusionComp         # Returns the Fusion composition object based on given index. 1 <= compIndex <= timelineItem.GetFusionCompCount()
   GetFusionCompNameList()                         --> [names...]         # Returns a list of Fusion composition names associated with the timeline item.
   GetFusionCompByName(compName)                   --> fusionComp         # Returns the Fusion composition object based on given name.
-  GetLeftOffset()                                 --> int                # Returns the maximum extension by frame for clip from left side.
-  GetRightOffset()                                --> int                # Returns the maximum extension by frame for clip from right side.
-  GetStart()                                      --> int                # Returns the start frame position on the timeline.
+  GetLeftOffset(subframe_precision)               --> int/float          # Returns the maximum extension by frame for clip from left side. Returns fractional frames if subframe_precision is True
+  GetRightOffset(subframe_precision)              --> int/float          # Returns the maximum extension by frame for clip from right side. Returns fractional frames if subframe_precision is True
+  GetStart(subframe_precision)                    --> int/float          # Returns the start frame position on the timeline. Returns fractional frames if subframe_precision is True
+  GetSourceStartFrame()                           --> int                # Returns the start frame position of the media pool clip in the timeline clip.
+  GetSourceStartTime()                            --> float              # Returns the start time position of the media pool clip in the timeline clip.
   SetProperty(propertyKey, propertyValue)         --> Bool               # Sets the value of property "propertyKey" to value "propertyValue"
                                                                          # Refer to "Looking up Timeline item properties" for more information
   GetProperty(propertyKey)                        --> int/[key:value]    # returns the value of the specified key
@@ -452,6 +466,7 @@ TimelineItem
   GetTrackTypeAndIndex()                          --> [trackType, trackIndex] # Returns a list of two values that correspond to the TimelineItem's trackType (string) and trackIndex (int) respectively.
                                                                            # trackType is one of {"audio", "video", "subtitle"}
                                                                            # 1 <= trackIndex <= Timeline.GetTrackCount(trackType)
+  GetSourceAudioChannelMapping()                 --> json formatted string # Returns a string with TimelineItem's audio mapping information. Check 'Audio Mapping' section below for more information.
 
 Gallery
   GetAlbumName(galleryStillAlbum)                 --> string             # Returns the name of the GalleryStillAlbum object 'galleryStillAlbum'.
@@ -576,9 +591,12 @@ Affects:
 * resolve.CLOUD_SYNC_UPLOAD_FAIL            == 8
 * resolve.CLOUD_SYNC_UPLOAD_NOT_FOUND       == 9
 
+* resolve.CLOUD_SYNC_SUCCESS                == 10
+
 Audio Mapping
 ---------------
-This section covers the output for mpItem.GetAudioMapping().
+This section covers the output for mpItem.GetAudioMapping() and timelineItem.GetSourceAudioChannelMapping()
+Mapping format (json result) is similar for mpItem and timelineItem.
 
 This section will follow an example of an mpItem that has audio from its embedded source, and from two other clips that are linked to it.
 The audio clip attributes of this mpItem will show 3 tracks.
@@ -603,16 +621,19 @@ mpItem.GetAudioMapping() returns a string of the form:
       },
       "track_mapping": {                            # Listing of all the tracks. Output here will match what is seen in the audio clip attributes menu on the UI.
         "1": {
-          "channel_idx": [0, 3],                    # Channel index '0' indicates that the channel is muted; in this case, channel index '3' will correspond to the first channel of (B)
+          "channel_idx": [1, 3],                    # In this case, channel index '1' corresponds to first channel of (A), channel index '3' will correspond to the first channel of (B)
+          "mute": true,                             # Mute 'true' indicates track is muted. Valid value is true/false.
           "type": "Stereo"                          # The length of the 'channel_idx' list will always correspond to the number of channels the format specified in 'type' will allow.
                                                     # In this case, 'Stereo' allows 2 channels and so the length of the 'channel_idx' list is 2.
         },
         "2": {
           "channel_idx": [3, 4, 5, 6, 7, 8, 9, 10], # Channel indices here are following the default for (B)
+          "mute": true,
           "type": "7.1"
         },
         "3": {
-          "channel_idx": [0, 0, 0, 1, 15, 16],      # The first three channels for this track are muted; The next channel is the first channel of (A), and the final 2 follow the default for (C)
+          "channel_idx": [1, 1, 1, 1, 15, 16],      # The first four channels for this track correspond to the first channel of (A), and the final 2 follow the default for (C)
+          "mute": false,
           "type": "5.1"
         }
       }
