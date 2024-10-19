@@ -672,7 +672,7 @@ if get_exif_tags and generate_matrix then
         camera_to_pcs = multiply(bradford_chromatic_adaptation(white_xy, D50_XY),
             inverse(get_xyz_to_camera_matrix_no_fm(white_xy, exif_tags, itm.outputWB.CurrentText)))
     elseif itm.method.CurrentText == "Use Forward Matrix" then
-        camera_to_pcs = inverse(get_xyz_to_camera_matrix_with_fm(white_xy, exif_tags, itm.outputWB.CurrentText))
+        camera_to_pcs = get_xyz_to_camera_matrix_with_fm(white_xy, exif_tags, itm.outputWB.CurrentText)
     end
 
     -- Adapt from D50 to target white point via bradford chromatic adaptation
