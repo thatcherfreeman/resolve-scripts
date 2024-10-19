@@ -121,8 +121,18 @@ if run_export then
                         else
                             media_item = track_item:GetMediaPoolItem()
                             id = media_item:GetMediaId()
-                            local start_frame = track_item:GetLeftOffset()
-                            local end_frame = track_item:GetRightOffset() - 1
+                            local start_frame = track_item:GetSourceStartFrame()
+                            local end_frame = track_item:GetSourceEndFrame() - 1
+                            -- print("Clip: ", id)
+                            -- print("Left Offset: ", track_item:GetLeftOffset())
+                            -- print("Right Offset: ", track_item:GetRightOffset())
+                            -- print("Start: ", track_item:GetStart())
+                            -- print("End: ", track_item:GetEnd())
+                            -- print("SourceStartFrame: ", track_item:GetSourceStartFrame())
+                            -- print("SourceEndFrame: ", track_item:GetSourceEndFrame())
+                            -- print("SourceStartTime: ", track_item:GetSourceStartTime())
+                            -- print("SourceEndTime: ", track_item:GetSourceEndTime())
+                            -- print()
                             if clips[id] ~= nil then
                                 start_frame = math.min(clips[id].clip_info.startFrame, start_frame)
                                 end_frame = math.max(clips[id].clip_info.endFrame, end_frame)
@@ -131,9 +141,6 @@ if run_export then
                                 idx = idx + 1
                                 clip_idx = idx
                             end
-                            print("leftoffset ", track_item:GetLeftOffset())
-                            print("duration ", track_item:GetDuration())
-                            print("rightoffset ", track_item:GetRightOffset())
                             clips[id] = {
                                 idx = clip_idx,
                                 clip_info = {
@@ -158,8 +165,8 @@ if run_export then
     end
     print("Clip items:")
     print_table(clip_items)
-    print(string.format("Adding %d items to new timeline...", #clip_items))
 
+    print(string.format("Adding %d items to new timeline...", #clip_items))
     media_pool:CreateTimelineFromClips(dst_timeline_name, clip_items)
 
     print("Done!")
