@@ -13,6 +13,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
     - [Coding](#coding)
         - [Get Scripting Properties](#get-scripting-properties)
     - [Color](#color)
+        - [Compute DNG Matrix](#compute-dng-matrix)
         - [Export CDLs](#export-cdls)
     - [Comp](#comp)
     - [Edit](#edit)
@@ -54,6 +55,9 @@ If a script doesn't seem to do anything, go to `Workspace > Console` and make a 
 Prints to the console the project/Timeline/Clip/MediaItem settings for reference.
 
 ## Color
+
+### Compute DNG Matrix
+Computes the Color Formation Matrix from the currently active DNG clip. The standard in DNG image processing is that two matrices are in the metadata of a DNG, one optimized for each of two white balance settings (usually daylight and illuminant A). These two matrices are interpolated between depending on the in-camera white balance setting. Additionally, this can be done in one of two methods: using the "Forward Matrix" approach, or with the standard approach that is used when the forward matrices are not provided (instead, using the ColorMatrix tags). This script requires that you have exiftool installed, so you'll have to paste in the path to exiftool in the first box that shows up, or you'll want to overwrite it in the first few lines of the script.
 
 ### Export CDLs
 With a relevant timeline open, run this script and specify a destination directory. In that folder, the script will write CDL, CC, or CCC files. CDL or CC files will be titled by the file name or reel name of the clip, depending on what is specified before you hit Go. If the reel name could not be found, it will write with the clip's file name.
