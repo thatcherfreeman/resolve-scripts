@@ -18,33 +18,55 @@ function print_table(t, indentation)
     print(outer_prefix, "}")
 end
 
-
 -- Draw window to get user parameters.
 local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
-local width,height = 500,200
+local width, height = 500, 200
 
-local is_windows = package.config:sub(1,1) ~= "/"
+local is_windows = package.config:sub(1, 1) ~= "/"
 
 win = disp:AddWindow({
     ID = "MyWin",
     WindowTitle = "Generate All Clips Timeline",
-    Geometry = { 100, 100, width, height },
+    Geometry = {100, 100, width, height},
     Spacing = 10,
     ui:VGroup{
         ID = "root",
         ui:HGroup{
             ID = "dst",
-            ui:Label{ID = "DstLabel", Text = "New Timeline Name"},
-            ui:TextEdit{ID = "DstTimelineName", Text = "", PlaceholderText = "Master Timeline",}
+            ui:Label{
+                ID = "DstLabel",
+                Text = "New Timeline Name"
+            },
+            ui:TextEdit{
+                ID = "DstTimelineName",
+                Text = "",
+                PlaceholderText = "Master Timeline"
+            }
         },
-        ui:CheckBox{ID = "includeDisabledItems", Text = "Include Disabled Clips"},
+        ui:CheckBox{
+            ID = "includeDisabledItems",
+            Text = "Include Disabled Clips"
+        },
+        ui:HGroup{ui:Label{
+            ID = "selectionMethodLabel",
+            Text = "Select Timelines By:"
+        }, ui:ComboBox{
+            ID = "selectionMethod",
+            Text = "Current Selection"
+        }},
         ui:HGroup{
             ID = "buttons",
-            ui:Button{ID = "cancelButton", Text = "Cancel"},
-            ui:Button{ID = "goButton", Text = "Go"},
-        },
-    },
+            ui:Button{
+                ID = "cancelButton",
+                Text = "Cancel"
+            },
+            ui:Button{
+                ID = "goButton",
+                Text = "Go"
+            }
+        }
+    }
 })
 
 run_export = false
@@ -69,13 +91,16 @@ end
 
 -- Add your GUI element based event functions here:
 itm = win:GetItems()
+itm.selectionMethod:AddItem('Current Selection')
+itm.selectionMethod:AddItem('Current Bin')
 
 win:Show()
 disp:RunLoop()
 win:Hide()
 
 if run_export then
-    assert(itm.DstTimelineName.PlainText ~= nil and itm.DstTimelineName.PlainText ~= "", "Found empty New Timeline Name! Refusing to run")
+    assert(itm.DstTimelineName.PlainText ~= nil and itm.DstTimelineName.PlainText ~= "",
+        "Found empty New Timeline Name! Refusing to run")
     dst_timeline_name = itm.DstTimelineName.PlainText
     allow_disabled_clips = itm.includeDisabledItems.Checked
 
@@ -100,7 +125,16 @@ if run_export then
     end
 
     -- Iterate through timelines in the current folder.
-    for _, media_pool_item in pairs(selected_bin:GetClipList()) do
+
+    local selected_clips
+    if itm.selectionMethod.CurrentText == "Current Bin" then
+        selected_clips = selected_bin:GetClipList()
+    elseif itm.selectionMethod.CurrentText == "Current Selection" then
+        selected_clips = media_pool:GetSelectedClips()
+    else
+        assert(false, "Unknown selection method.")
+    end
+    for _, media_pool_item in pairs(selected_clips) do
         -- Check if it's a timeline
         if type(media_pool_item) == nil or type(media_pool_item) == "number" then
             print("Skipping", media_pool_item)
@@ -146,7 +180,7 @@ if run_export then
                                 clip_info = {
                                     mediaPoolItem = media_item,
                                     startFrame = start_frame,
-                                    endFrame = end_frame,
+                                    endFrame = end_frame
                                 }
                             }
                         end
@@ -155,9 +189,6 @@ if run_export then
             end
         end
     end
-
-
-
 
     clip_items = {}
     for _, clip_item in pairs(clips) do
