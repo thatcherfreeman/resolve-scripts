@@ -571,6 +571,8 @@ if get_exif_tags then
     exif_tags = cleanup_exif_tags(exif_tags)
     print("Extracted tags: ")
     print_table(exif_tags)
+else
+    os.exit()
 end
 
 -- Give choice of white point and generate the appropriate matrix
