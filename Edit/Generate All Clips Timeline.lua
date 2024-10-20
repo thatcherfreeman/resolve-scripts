@@ -18,10 +18,68 @@ function print_table(t, indentation)
     print(outer_prefix, "}")
 end
 
+function sort_clip_infos(clip_infos)
+    -- In place sort by startFrame
+    table.sort(clip_infos, function(a, b)
+        return a.startFrame < b.startFrame
+    end)
+end
+
+function merge_clip_infos(clip_info_a, clip_info_b)
+    -- Return new clipinfo that spans clip_info_a and clip_info_b
+    assert(clip_info_a.mediaPoolItem == clip_info_b.mediaPoolItem,
+        "merge_clip_infos: Cannot merge clip infos from different media pool items")
+    return {
+        mediaPoolItem = clip_info_a.mediaPoolItem,
+        startFrame = math.min(clip_info_a.startFrame, clip_info_b.startFrame),
+        endFrame = math.max(clip_info_a.endFrame, clip_info_b.endFrame)
+    }
+end
+
+function check_clip_infos_overlap(clip_info_a, clip_info_b, connection_threshold)
+    return not (clip_info_a.endFrame < clip_info_b.startFrame - connection_threshold or clip_info_b.endFrame <
+               clip_info_a.startFrame - connection_threshold)
+end
+
+function merge_clip_infos_if_close(clip_info_a, clip_info_b, connection_threshold)
+    assert(clip_info_a.mediaPoolItem == clip_info_b.mediaPoolItem,
+        "merge_clip_infos_if_close: Cannot merge clip infos from different media pool items")
+    if check_clip_infos_overlap(clip_info_a, clip_info_b, connection_threshold) then
+        return merge_clip_infos(clip_info_a, clip_info_b)
+    end
+    return nil
+end
+
+function merge_clip_infos_if_close_all(clip_infos, connection_threshold)
+    -- Merge clip_infos that are close together
+    sort_clip_infos(clip_infos)
+    local i = 1
+    while i <= #clip_infos do
+        local j = i + 1
+        local merged = false
+        while j <= #clip_infos do
+            local merged_clip_info = merge_clip_infos_if_close(clip_infos[i], clip_infos[j], connection_threshold)
+            if merged_clip_info ~= nil then
+                print("Merging clips ", clip_infos[i].mediaPoolItem:GetName(), " and ",
+                    clip_infos[j].mediaPoolItem:GetName())
+                clip_infos[i] = merged_clip_info
+                table.remove(clip_infos, j)
+                merged = true
+            else
+                j = j + 1
+            end
+        end
+        if not merged then
+            i = i + 1
+        end
+    end
+    return clip_infos
+end
+
 -- Draw window to get user parameters.
 local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
-local width, height = 500, 200
+local width, height = 500, 300
 
 local is_windows = package.config:sub(1, 1) ~= "/"
 
@@ -44,10 +102,6 @@ win = disp:AddWindow({
                 PlaceholderText = "Master Timeline"
             }
         },
-        ui:CheckBox{
-            ID = "includeDisabledItems",
-            Text = "Include Disabled Clips"
-        },
         ui:HGroup{ui:Label{
             ID = "selectionMethodLabel",
             Text = "Select Timelines By:"
@@ -55,6 +109,18 @@ win = disp:AddWindow({
             ID = "selectionMethod",
             Text = "Current Selection"
         }},
+        ui:HGroup{ui:Label{
+            ID = "ConnectionThresholdLabel",
+            Text = "Connection Threshold (Frames)"
+        }, ui:TextEdit{
+            ID = "ConnectionThreshold",
+            Text = "24",
+            PlaceholderText = "24"
+        }},
+        ui:CheckBox{
+            ID = "includeDisabledItems",
+            Text = "Include Disabled Clips"
+        },
         ui:HGroup{
             ID = "buttons",
             ui:Button{
@@ -101,6 +167,7 @@ win:Hide()
 if run_export then
     assert(itm.DstTimelineName.PlainText ~= nil and itm.DstTimelineName.PlainText ~= "",
         "Found empty New Timeline Name! Refusing to run")
+    local connection_threshold = tonumber(itm.ConnectionThreshold.PlainText)
     dst_timeline_name = itm.DstTimelineName.PlainText
     allow_disabled_clips = itm.includeDisabledItems.Checked
 
@@ -115,7 +182,6 @@ if run_export then
     -- Iterate through timelines, figure out what clips we need and what frames are required.
     -- We'll make a table where the key is a clip identifier and the value is a clipinfo.
     local clips = {}
-    local idx = 0
 
     -- Mapping of timeline name to timeline object
     project_timelines = {}
@@ -157,32 +223,15 @@ if run_export then
                             id = media_item:GetMediaId()
                             local start_frame = track_item:GetSourceStartFrame()
                             local end_frame = track_item:GetSourceEndFrame() - 1
-                            -- print("Clip: ", id)
-                            -- print("Left Offset: ", track_item:GetLeftOffset())
-                            -- print("Right Offset: ", track_item:GetRightOffset())
-                            -- print("Start: ", track_item:GetStart())
-                            -- print("End: ", track_item:GetEnd())
-                            -- print("SourceStartFrame: ", track_item:GetSourceStartFrame())
-                            -- print("SourceEndFrame: ", track_item:GetSourceEndFrame())
-                            -- print("SourceStartTime: ", track_item:GetSourceStartTime())
-                            -- print("SourceEndTime: ", track_item:GetSourceEndTime())
-                            -- print()
-                            if clips[id] ~= nil then
-                                start_frame = math.min(clips[id].clip_info.startFrame, start_frame)
-                                end_frame = math.max(clips[id].clip_info.endFrame, end_frame)
-                                clip_idx = clips[id].idx
-                            else
-                                idx = idx + 1
-                                clip_idx = idx
+                            if clips[id] == nil then
+                                clips[id] = {}
                             end
-                            clips[id] = {
-                                idx = clip_idx,
-                                clip_info = {
-                                    mediaPoolItem = media_item,
-                                    startFrame = start_frame,
-                                    endFrame = end_frame
-                                }
+                            clip_info = {
+                                mediaPoolItem = media_item,
+                                startFrame = start_frame,
+                                endFrame = end_frame
                             }
+                            clips[id][#clips[id] + 1] = clip_info
                         end
                     end
                 end
@@ -190,15 +239,26 @@ if run_export then
         end
     end
 
-    clip_items = {}
-    for _, clip_item in pairs(clips) do
-        clip_items[clip_item.idx] = clip_item.clip_info
-    end
-    print("Clip items:")
-    print_table(clip_items)
+    print("Unmerged clips:")
+    print_table(clips)
 
-    print(string.format("Adding %d items to new timeline...", #clip_items))
-    media_pool:CreateTimelineFromClips(dst_timeline_name, clip_items)
+    -- for each clips[id], merge clip_infos that are less than a certain amount of frames apart
+    for id, clip_infos in pairs(clips) do
+        clips[id] = merge_clip_infos_if_close_all(clip_infos, connection_threshold)
+    end
+
+    print("Merged Clips")
+    print_table(clips)
+
+    print("Adding all clips to new timeline...")
+    local new_timeline = media_pool:CreateEmptyTimeline(dst_timeline_name)
+    assert(project:SetCurrentTimeline(new_timeline), "couldn't set current timeline to the new timeline")
+
+    for _, clip_infos in pairs(clips) do
+        for _, clip_info in pairs(clip_infos) do
+            media_pool:AppendToTimeline({clip_info})
+        end
+    end
 
     print("Done!")
 end
