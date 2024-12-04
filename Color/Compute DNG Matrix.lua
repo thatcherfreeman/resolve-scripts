@@ -145,6 +145,16 @@ function add(mat1, mat2)
     return out
 end
 
+function sum(mat)
+    -- Returns the sum of all entries in the matrix.
+    assert(type(mat) == "table")
+    local out = 0
+    for i = 1, #mat do
+        out = out + mat[i]
+    end
+    return out
+end
+
 function scale(mat, s)
     assert(type(mat) == "table" and type(s) == "number")
     local out = {}
@@ -686,5 +696,8 @@ if get_exif_tags and generate_matrix then
     local camera_to_dwg = multiply(get_XYZ_to_rgb_matrix(target_primaries),
         multiply(camera_to_xyz_wp_adapted, diagonal(exif_tags['AsShotNeutral'])))
     print(string.format("Camera to %s: ", itm.outputGamut.CurrentText))
-    print_table(camera_to_dwg)
+
+    -- Overall exposure adjustment so that the sum of the matrix is 3.0
+    local scaled_camera_to_dwg = scale(camera_to_dwg, 3.0 / sum(camera_to_dwg))
+    print_table(scaled_camera_to_dwg)
 end
