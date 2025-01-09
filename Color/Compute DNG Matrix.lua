@@ -323,6 +323,29 @@ function illuminant_to_temperature(illuminant)
     assert(false, string.format("Unexpected illuminant type: %s", illuminant))
 end
 
+function illuminant_to_xy(illuminant)
+    assert(type(illuminant) == "string")
+    if illuminant == "Tungsten" or illuminant == "Standard Light A" then
+        return {0.44758, 0.40745}
+    elseif illuminant == "D50" then
+        return {0.34567, 0.35850}
+    elseif illuminant == "Standard Light B" then
+        return {0.34842, 0.35161}
+    elseif illuminant == "Standard Light C" then
+        return {0.31006, 0.31616}
+    elseif illuminant == "D55" or illuminant == "Daylight" or illuminant == "Fine Weather" then
+        return {0.33242, 0.34743}
+    elseif illuminant == "D65" or illuminant == "Cloudy Weather" then
+        return {0.31272, 0.32903}
+    elseif illuminant == "D75" or illuminant == "Shade" then
+        return {0.29902, 0.31485}
+    elseif illuminant == "Other" then
+        assert(false, "Other illuminant type " .. illuminant .. " is not supported.")
+        -- return dng_temperature (data.WhiteXY ()).Temperature ();
+    end
+    assert(false, string.format("Unsupported illuminant type in illuminant_to_xy: %s", illuminant))
+end
+
 function interpolate_matrix(mat1, mat2, temp1, temp2, interp_temp)
     local factor = ((1.0 / interp_temp) - (1.0 / temp2)) / ((1.0 / temp1) - (1.0 / temp2))
     if factor >= 1.0 then
@@ -413,7 +436,7 @@ function get_xyz_to_camera_matrix_no_fm(white_xy, exif_tags, override_wb)
     return camera_matrix
 end
 
-function get_xyz_to_camera_matrix_with_fm(white_xy, exif_tags, override_wb)
+function get_camera_to_xyz_matrix_with_fm(white_xy, exif_tags, override_wb)
     if override_wb == nil then
         override_wb = "Current WB"
     end
@@ -669,22 +692,31 @@ win:Hide()
 
 if get_exif_tags and generate_matrix then
     local white_xy
-    if exif_tags['AsShotNeutral'] ~= nil then
-        white_xy = neutral_to_xy(exif_tags['AsShotNeutral'], exif_tags)
-    elseif exif_tags['AsShotWhiteXY'] ~= nil then
-        white_xy = exif_tags['AsShotWhiteXY']
+    if itm.outputWB.CurrentText == "Current WB" then
+        if exif_tags['AsShotNeutral'] ~= nil then
+            white_xy = neutral_to_xy(exif_tags['AsShotNeutral'], exif_tags)
+        elseif exif_tags['AsShotWhiteXY'] ~= nil then
+            white_xy = exif_tags['AsShotWhiteXY']
+        else
+            print("Camera doesn't have AsShotNeutral or AsShotWhiteXY tags, assuming D50.")
+            white_xy = D50_XY
+        end
     else
-        print("Camera doesn't have AsShotNeutral or AsShotWhiteXY tags, assuming D50.")
-        white_xy = D50_XY
+        -- Try to use the selected white balance as the illuminant xy.
+        white_xy = illuminant_to_xy(itm.outputWB.CurrentText)
     end
+    print("Effective White xy: ")
+    print_table(white_xy)
 
     -- Matrix to XYZ D50
     local camera_to_pcs
     if itm.method.CurrentText == "Use Default" then
+        print("Using method: get_xyz_to_camera_matrix_no_fm")
         camera_to_pcs = multiply(bradford_chromatic_adaptation(white_xy, D50_XY),
             inverse(get_xyz_to_camera_matrix_no_fm(white_xy, exif_tags, itm.outputWB.CurrentText)))
     elseif itm.method.CurrentText == "Use Forward Matrix" then
-        camera_to_pcs = get_xyz_to_camera_matrix_with_fm(white_xy, exif_tags, itm.outputWB.CurrentText)
+        print("Using method: get_xyz_to_camera_matrix_with_fm")
+        camera_to_pcs = get_camera_to_xyz_matrix_with_fm(white_xy, exif_tags, itm.outputWB.CurrentText)
     end
 
     -- Adapt from D50 to target white point via bradford chromatic adaptation
