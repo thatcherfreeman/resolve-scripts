@@ -21,7 +21,7 @@ end
 -- Draw window to get user parameters.
 local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
-local width, height = 500, 200
+local width, height = 500, 400 -- Increased height to ensure all elements are visible
 
 local is_windows = package.config:sub(1, 1) ~= "/"
 
@@ -33,7 +33,19 @@ win = disp:AddWindow({
     ui:VGroup{
         ID = "root",
         ui:HGroup{
-            ID = "dst",
+            ID = "prefix",
+            ui:Label{
+                ID = "PrefixLabel",
+                Text = "Add Prefix"
+            },
+            ui:TextEdit{
+                ID = "PrefixText",
+                Text = "",
+                PlaceholderText = "prefix"
+            }
+        },
+        ui:HGroup{
+            ID = "find",
             ui:Label{
                 ID = "FindLabel",
                 Text = "Find String"
@@ -45,7 +57,7 @@ win = disp:AddWindow({
             }
         },
         ui:HGroup{
-            ID = "dst",
+            ID = "replace",
             ui:Label{
                 ID = "ReplaceLabel",
                 Text = "Replace String"
@@ -54,6 +66,18 @@ win = disp:AddWindow({
                 ID = "ReplaceText",
                 Text = "",
                 PlaceholderText = "replace"
+            }
+        },
+        ui:HGroup{
+            ID = "suffix",
+            ui:Label{
+                ID = "SuffixLabel",
+                Text = "Add Suffix"
+            },
+            ui:TextEdit{
+                ID = "SuffixText",
+                Text = "",
+                PlaceholderText = "suffix"
             }
         },
         ui:HGroup{
@@ -69,6 +93,7 @@ win = disp:AddWindow({
         }
     }
 })
+
 -- Add your GUI element based event functions here:
 itm = win:GetItems()
 
@@ -84,11 +109,11 @@ end
 
 function win.On.goButton.Clicked(ev)
     print("Go Clicked")
-    -- disp:ExitLoop()
-    assert(itm.FindText.PlainText ~= nil and itm.FindText.PlainText ~= "",
-        "Found empty New Timeline Name! Refusing to run")
+    -- Get text from all fields
     find_text = itm.FindText.PlainText
     replace_text = itm.ReplaceText.PlainText
+    prefix_text = itm.PrefixText.PlainText
+    suffix_text = itm.SuffixText.PlainText
 
     -- Get timelines
     resolve = Resolve()
@@ -114,7 +139,24 @@ function win.On.goButton.Clicked(ev)
             desired_timeline_name = media_pool_item:GetName()
             curr_timeline = project_timelines[desired_timeline_name]
             curr_name = curr_timeline:GetName()
-            new_name = string.gsub(curr_name, find_text, replace_text)
+
+            -- Apply find and replace if find_text is not empty
+            new_name = curr_name
+            if find_text ~= "" then
+                new_name = string.gsub(new_name, find_text, replace_text)
+            end
+
+            -- Apply prefix if specified
+            if prefix_text ~= "" then
+                new_name = prefix_text .. new_name
+            end
+
+            -- Apply suffix if specified
+            if suffix_text ~= "" then
+                new_name = new_name .. suffix_text
+            end
+
+            -- Only rename if the name has changed
             if curr_name ~= new_name then
                 curr_timeline:SetName(new_name)
                 print("Renaming Timeline: ", curr_name, " --> ", new_name)

@@ -78,7 +78,7 @@ Generates a timeline that contains all the video clips used in any timeline in y
 Find and replace clip names within the current media pool bin.
 
 ### Rename Timelines
-Find and replace timeline names within the current bin.
+Find and replace timeline names within the current bin, and add prefixes or suffixes.
 
 ## Deliver
 
