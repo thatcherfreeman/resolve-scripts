@@ -31,6 +31,14 @@ function print_table(t, indentation)
     print(outer_prefix, "}")
 end
 
+function print_matrix_c_style(mat)
+    print("{")
+    print("    {", mat[1], ", ", mat[2], ", ", mat[3], "},")
+    print("    {", mat[4], ", ", mat[5], ", ", mat[6], "},")
+    print("    {", mat[7], ", ", mat[8], ", ", mat[9], "},")
+    print("}")
+end
+
 function runCmd(cmd)
     local fileHandle = assert(io.popen(cmd, 'r'))
     local out = assert(fileHandle:read('*a'))
@@ -731,5 +739,5 @@ if get_exif_tags and generate_matrix then
 
     -- Overall exposure adjustment so that the sum of the matrix is 3.0
     local scaled_camera_to_dwg = scale(camera_to_dwg, 3.0 / sum(camera_to_dwg))
-    print_table(scaled_camera_to_dwg)
+    print_matrix_c_style(scaled_camera_to_dwg)
 end
