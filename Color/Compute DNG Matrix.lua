@@ -597,7 +597,7 @@ if get_exif_tags then
     end
 
     local file_path = media_item:GetClipProperty("File Path")
-    assert(file_path:endswith(".dng"), "File for current clip needs to end with .dng!")
+    assert(file_path:endswith(".dng") or file_path:endswith(".DNG"), "File for current clip needs to end with .dng!")
     print("Found file: ", file_path)
 
     file_path = string.gsub(file_path, "(%[(%d+)%-(%d+)%])", "%2")
