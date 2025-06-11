@@ -140,12 +140,41 @@ function get_version_report(selected_clips)
     return version_report
 end
 
-assert(#selected_clips > 0, "No clips selected. Please select clips in the Media Pool to update their version numbers.")
-
 -- Draw window to get user parameters.
 local ui = fu.UIManager
 local disp = bmd.UIDispatcher(ui)
 local width, height = 500, 400 -- Increased height to ensure all elements are visible
+
+if (selected_clips == nil or #selected_clips == 0) then
+    local noClipsWin = disp:AddWindow({
+        ID = "NoClipsWin",
+        WindowTitle = "Error",
+        Geometry = {400, 100, 400, 100},
+        ui:VGroup{
+            ui:Label{
+                ID = "noClipsLabel",
+                Text = "No clips selected.\nPlease select clips in the Media Pool."
+            },
+            ui:Button{
+                ID = "closeNoClipsButton",
+                Text = "Close"
+            }
+        }
+    })
+
+    function noClipsWin.On.NoClipsWin.Close(ev)
+        disp:ExitLoop()
+    end
+
+    function noClipsWin.On.closeNoClipsButton.Clicked(ev)
+        disp:ExitLoop()
+    end
+
+    noClipsWin:Show()
+    disp:RunLoop()
+    noClipsWin:Hide()
+    return
+end
 
 local is_windows = package.config:sub(1, 1) ~= "/"
 local win = disp:AddWindow({
@@ -153,7 +182,7 @@ local win = disp:AddWindow({
     WindowTitle = "Update Version Numbers",
     Geometry = {100, 33, width, height},
     Spacing = 10,
-    ui:VGroup{
+    ui:HGroup{
         ID = "root",
         ui:HGroup{
             ID = "label",
@@ -162,23 +191,18 @@ local win = disp:AddWindow({
                 Text = "Identified Clips\n" .. get_version_report(selected_clips)
             }
         },
-        ui:HGroup{
-            ID = "version_specify",
-            ui:Label{
-                ID = "Set Version",
-                Text = "Set Version Number"
-            },
-            ui:TextEdit{
-                ID = "SetVersionText",
-                Text = "",
-                PlaceholderText = "1"
-            }
-        },
-        ui:HGroup{
-            ID = "buttons",
-            ui:Button{
-                ID = "cancelButton",
-                Text = "Cancel"
+        ui:VGroup{
+            ui:HGroup{
+                ID = "version_specify",
+                ui:Label{
+                    ID = "Set Version",
+                    Text = "Set Version Number"
+                },
+                ui:TextEdit{
+                    ID = "SetVersionText",
+                    Text = "",
+                    PlaceholderText = "1"
+                }
             },
             ui:Button{
                 ID = "setVersionButton",
@@ -187,8 +211,12 @@ local win = disp:AddWindow({
             ui:Button{
                 ID = "maxVersionButton",
                 Text = "Maximize Version"
+            },
+            ui:Button{
+                ID = "closeButton",
+                Text = "Close"
             }
-        }
+        },
     }
 })
 
@@ -200,8 +228,8 @@ function win.On.MyWin.Close(ev)
     disp:ExitLoop()
 end
 
-function win.On.cancelButton.Clicked(ev)
-    print("Cancel Clicked")
+function win.On.closeButton.Clicked(ev)
+    print("Close Clicked")
     disp:ExitLoop()
 end
 
