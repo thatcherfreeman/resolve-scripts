@@ -127,7 +127,8 @@ function get_version_report(selected_clips)
     for i, clip in ipairs(selected_clips) do
         local version_num, _, _, version_str = get_version_from_clip(clip)
         if version_num then
-            table.insert(version_report_lines, string.format("Clip: %s\n  Current Version: %s", clip:GetName(), version_str))
+            table.insert(version_report_lines,
+                string.format("Clip: %s\n  Current Version: %s", clip:GetName(), version_str))
             local available_versions = get_available_versions_for_clip(clip)
             if #available_versions > 0 then
                 table.insert(version_report_lines, "  Available Versions: " .. table.concat(available_versions, ", "))
