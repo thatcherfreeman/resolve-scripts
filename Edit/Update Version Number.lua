@@ -39,11 +39,42 @@ function get_version_from_clip(clip)
     return nil
 end
 
-function set_version_on_clip(clip, version_num)
+function get_available_versions_for_clip(clip)
+    local original_version, v_char, version_length, version_str = get_version_from_clip(clip)
+    if not original_version then
+        return {}
+    end
+
+    local versions = {}
+    -- Traverse forwards from original_version
+    local v = original_version
+    while set_version_on_clip(clip, v, false) do
+        table.insert(versions, v)
+        v = v + 1
+    end
+
+    -- Traverse backwards from original_version - 1
+    v = original_version - 1
+    while v >= 0 and set_version_on_clip(clip, v, false) do
+        table.insert(versions, v)
+        v = v - 1
+    end
+
+    -- Sort versions in ascending order
+    table.sort(versions)
+
+    -- Restore original version
+    set_version_on_clip(clip, original_version)
+    return versions
+end
+
+function set_version_on_clip(clip, version_num, verbose)
     local path = clip:GetClipProperty("File Path")
     local successful = false
 
-    print("Attempting to set version on clip: " .. clip:GetName() .. " to version: " .. tostring(version_num))
+    if verbose then
+        print("Attempting to set version on clip: " .. clip:GetName() .. " to version: " .. tostring(version_num))
+    end
 
     if path then
         local curr_version_num, v_char, version_length, version_str = get_version_from_clip(clip)
@@ -51,17 +82,19 @@ function set_version_on_clip(clip, version_num)
             local new_version_str = v_char .. string.format("%0" .. tostring(version_length) .. "d", version_num)
             local new_path = string.gsub(path, v_char .. version_str, new_version_str)
             successful = clip:ReplaceClip(new_path)
-            if clip:GetClipProperty("File Path") == new_path then
-                print("Successfully set version on clip: " .. clip:GetName())
-            else
-                print("Failed to set version on clip: " .. clip:GetName())
+            if verbose then
+                if clip:GetClipProperty("File Path") == new_path then
+                    print("Successfully set version on clip: " .. clip:GetName())
+                else
+                    print("Failed to set version on clip: " .. clip:GetName())
+                end
             end
         end
     end
     return successful
 end
 
-function max_version_on_clip(clip)
+function max_version_on_clip(clip, verbose)
     local curr_version, v_char, version_length, version_str = get_version_from_clip(clip)
     if not curr_version then
         return nil
@@ -69,7 +102,7 @@ function max_version_on_clip(clip)
     local max_version = curr_version
     while true do
         local next_version = max_version + 1
-        if set_version_on_clip(clip, next_version) then
+        if set_version_on_clip(clip, next_version, verbose) then
             max_version = next_version
         else
             break
@@ -94,10 +127,15 @@ function get_version_report(selected_clips)
     for i, clip in ipairs(selected_clips) do
         local version_num, _, _, version_str = get_version_from_clip(clip)
         if version_num then
-            table.insert(version_report_lines, string.format("Clip: %s\n  Version: %s", clip:GetName(), version_str))
+            table.insert(version_report_lines, string.format("Clip: %s\n  Current Version: %s", clip:GetName(), version_str))
+            local available_versions = get_available_versions_for_clip(clip)
+            if #available_versions > 0 then
+                table.insert(version_report_lines, "  Available Versions: " .. table.concat(available_versions, ", "))
+            end
         end
     end
-    version_report = table.concat(version_report_lines, "\n\n")
+    version_report = table.concat(version_report_lines, "\n")
+    print("Version Report:\n" .. version_report)
     return version_report
 end
 
@@ -171,7 +209,7 @@ function win.On.setVersionButton.Clicked(ev)
 
     for i, clip in ipairs(selected_clips) do
         if target_version then
-            if set_version_on_clip(clip, target_version) then
+            if set_version_on_clip(clip, target_version, true) then
                 print("Set version on clip: " .. clip:GetName() .. " to " .. target_version)
             else
                 print("Failed to set version on clip: " .. clip:GetName())
@@ -187,7 +225,7 @@ end
 
 function win.On.maxVersionButton.Clicked(ev)
     for i, clip in ipairs(selected_clips) do
-        local max_version = max_version_on_clip(clip)
+        local max_version = max_version_on_clip(clip, true)
         if max_version then
             print("Maximized version on clip: " .. clip:GetName() .. " to " .. max_version)
         else
