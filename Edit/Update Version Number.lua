@@ -68,21 +68,38 @@ function get_available_versions_for_clip(clip)
     return versions
 end
 
+function modify_path_for_replacement_clip(clip_path)
+    -- Image sequences will have a "file path" attribute looks something like
+    -- sequence_v00002/sample_sequence[0000-0005].jpg
+
+    -- We need to replace this with the path for the first image in the sequence.
+    -- sequence_v00002/sample_sequence0000.jpg
+
+    -- Replace [xxxx-yyyy] with the starting frame number, keeping padding and extension
+    local new_path = clip_path:gsub("(%[)(%d+)%-(%d+)%](%.[^/\\]+)$",
+        function(open_bracket, start_frame, end_frame, ext)
+            return start_frame .. ext
+        end)
+    return new_path
+end
+
 function set_version_on_clip(clip, version_num, verbose)
     local path = clip:GetClipProperty("File Path")
     local successful = false
 
     if verbose then
         print("Attempting to set version on clip: " .. clip:GetName() .. " to version: " .. tostring(version_num))
+        print("Current path: " .. (path or "nil"))
     end
 
     if path then
         local curr_version_num, v_char, version_length, version_str = get_version_from_clip(clip)
         if curr_version_num then
             local new_version_str = v_char .. string.format("%0" .. tostring(version_length) .. "d", version_num)
-            local new_path = string.gsub(path, v_char .. version_str, new_version_str)
+            local new_path = modify_path_for_replacement_clip(string.gsub(path, v_char .. version_str, new_version_str))
             successful = clip:ReplaceClip(new_path)
             if verbose then
+                print("New path: " .. new_path)
                 if clip:GetClipProperty("File Path") == new_path then
                     print("Successfully set version on clip: " .. clip:GetName())
                 else
@@ -150,16 +167,13 @@ if (selected_clips == nil or #selected_clips == 0) then
         ID = "NoClipsWin",
         WindowTitle = "Error",
         Geometry = {400, 100, 400, 100},
-        ui:VGroup{
-            ui:Label{
-                ID = "noClipsLabel",
-                Text = "No clips selected.\nPlease select clips in the Media Pool."
-            },
-            ui:Button{
-                ID = "closeNoClipsButton",
-                Text = "Close"
-            }
-        }
+        ui:VGroup{ui:Label{
+            ID = "noClipsLabel",
+            Text = "No clips selected.\nPlease select clips in the Media Pool."
+        }, ui:Button{
+            ID = "closeNoClipsButton",
+            Text = "Close"
+        }}
     })
 
     function noClipsWin.On.NoClipsWin.Close(ev)
@@ -191,32 +205,27 @@ local win = disp:AddWindow({
                 Text = "Identified Clips\n" .. get_version_report(selected_clips)
             }
         },
-        ui:VGroup{
-            ui:HGroup{
-                ID = "version_specify",
-                ui:Label{
-                    ID = "Set Version",
-                    Text = "Set Version Number"
-                },
-                ui:TextEdit{
-                    ID = "SetVersionText",
-                    Text = "",
-                    PlaceholderText = "1"
-                }
+        ui:VGroup{ui:HGroup{
+            ID = "version_specify",
+            ui:Label{
+                ID = "Set Version",
+                Text = "Set Version Number"
             },
-            ui:Button{
-                ID = "setVersionButton",
-                Text = "Set Specified Version"
-            },
-            ui:Button{
-                ID = "maxVersionButton",
-                Text = "Maximize Version"
-            },
-            ui:Button{
-                ID = "closeButton",
-                Text = "Close"
+            ui:TextEdit{
+                ID = "SetVersionText",
+                Text = "",
+                PlaceholderText = "1"
             }
-        },
+        }, ui:Button{
+            ID = "setVersionButton",
+            Text = "Set Specified Version"
+        }, ui:Button{
+            ID = "maxVersionButton",
+            Text = "Maximize Version"
+        }, ui:Button{
+            ID = "closeButton",
+            Text = "Close"
+        }}
     }
 })
 
