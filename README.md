@@ -21,6 +21,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
         - [Generate All Clips Timeline](#generate-all-clips-timeline)
         - [Rename Clips](#rename-clips)
         - [Rename Timelines](#rename-timelines)
+        - [Update Version Number](#update-version-number)
     - [Deliver](#deliver)
     - [Utility](#utility)
         - [Relink Media Pool Clips](#relink-media-pool-clips)
@@ -79,6 +80,9 @@ Find and replace clip names within the current media pool bin.
 
 ### Rename Timelines
 Find and replace timeline names within the current bin, and add prefixes or suffixes.
+
+### Update Version Number
+Select some clips in the media pool. This goes through clips whose paths include something like "v002" or "V1234" and replaces each selected media pool item with a new version number.
 
 ## Deliver
 
