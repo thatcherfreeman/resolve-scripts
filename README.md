@@ -84,6 +84,12 @@ Find and replace timeline names within the current bin, and add prefixes or suff
 ### Update Version Number
 Select some clips in the media pool. This goes through clips whose paths include something like "v002" or "V1234" and replaces each selected media pool item with a new version number.
 
+#### Known Caveats:
+**if you're skipping version numbers for some reason** - This will break the "maximize version" button because that works by incrementing the version number until it fails.
+
+**or if your file path for a clip has multiple v#### where they do not match** - How am I supposed to adjust version numbers in this case right
+
+
 ## Deliver
 
 ## Utility
