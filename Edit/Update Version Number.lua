@@ -48,16 +48,30 @@ function get_available_versions_for_clip(clip)
     local versions = {}
     -- Traverse forwards from original_version
     local v = original_version
-    while set_version_on_clip(clip, v, false) do
-        table.insert(versions, v)
-        v = v + 1
+    local failed_count = 0
+    while failed_count < 10 do
+        if set_version_on_clip(clip, v, false) then
+            table.insert(versions, v)
+            v = v + 1
+            failed_count = 0
+        else
+            v = v + 1
+            failed_count = failed_count + 1
+        end
     end
 
     -- Traverse backwards from original_version - 1
     v = original_version - 1
-    while v >= 0 and set_version_on_clip(clip, v, false) do
-        table.insert(versions, v)
-        v = v - 1
+    local failed_count = 0
+    while v >= 0 and failed_count < 10 do
+        if set_version_on_clip(clip, v, false) then
+            table.insert(versions, v)
+            v = v - 1
+            failed_count = 0
+        else
+            v = v - 1
+            failed_count = failed_count + 1
+        end
     end
 
     -- Sort versions in ascending order
@@ -117,12 +131,15 @@ function max_version_on_clip(clip, verbose)
         return nil
     end
     local max_version = curr_version
-    while true do
-        local next_version = max_version + 1
+    local next_version = max_version
+    local attempts = 0
+    while attempts < 10 do
+        next_version = next_version + 1
         if set_version_on_clip(clip, next_version, verbose) then
             max_version = next_version
+            attempts = 0
         else
-            break
+            attempts = attempts + 1
         end
     end
     set_version_on_clip(clip, max_version)
