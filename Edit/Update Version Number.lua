@@ -1,3 +1,5 @@
+NUM_NONCONSECUTIVE_VERSIONS = 20
+
 function print_table(t, indentation)
     if indentation == nil then
         indentation = 0
@@ -49,7 +51,7 @@ function get_available_versions_for_clip(clip)
     -- Traverse forwards from original_version
     local v = original_version
     local failed_count = 0
-    while failed_count < 10 do
+    while failed_count < NUM_NONCONSECUTIVE_VERSIONS do
         if set_version_on_clip(clip, v, false) then
             table.insert(versions, v)
             v = v + 1
@@ -63,7 +65,7 @@ function get_available_versions_for_clip(clip)
     -- Traverse backwards from original_version - 1
     v = original_version - 1
     local failed_count = 0
-    while v >= 0 and failed_count < 10 do
+    while v >= 0 and failed_count < NUM_NONCONSECUTIVE_VERSIONS do
         if set_version_on_clip(clip, v, false) then
             table.insert(versions, v)
             v = v - 1
@@ -133,7 +135,7 @@ function max_version_on_clip(clip, verbose)
     local max_version = curr_version
     local next_version = max_version
     local attempts = 0
-    while attempts < 10 do
+    while attempts < NUM_NONCONSECUTIVE_VERSIONS do
         next_version = next_version + 1
         if set_version_on_clip(clip, next_version, verbose) then
             max_version = next_version
