@@ -15,6 +15,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
     - [Color](#color)
         - [Compute DNG Matrix](#compute-dng-matrix)
         - [Export CDLs](#export-cdls)
+        - [Toggle Nodes](#toggle-nodes)
     - [Comp](#comp)
     - [Edit](#edit)
         - [Copy Timeline Settings](#copy-timeline-settings)
@@ -64,6 +65,9 @@ Computes the Color Formation Matrix from the currently active DNG clip. The stan
 With a relevant timeline open, run this script and specify a destination directory. In that folder, the script will write CDL, CC, or CCC files. CDL or CC files will be titled by the file name or reel name of the clip, depending on what is specified before you hit Go. If the reel name could not be found, it will write with the clip's file name.
 
 The script goes through each clip in the timeline in the first track in order and generates a CDL, CC, or CCC file. If a file already exists, then the script will refuse to overwrite that file unless "Overwrite color files" is checked. I would not recommend running this on timelines that have Fusion compositions, compound clips, or duplicate clips/clips that have been split. I would also recommend running this with the console open just to see if there are any warnings and for an explanation of which clips were skipped, etc.
+
+### Toggle Nodes
+Indicate the node id and layer index and this tool will allow you to enable or disable all nodes with that node number.
 
 ## Comp
 
