@@ -1,6 +1,6 @@
 -- Version Control v2.3 - Context-Aware (Media Pool vs Timeline)
+-- written by Pinionist, based on Update Version Number script by Thatcher Freeman
 -- Fixed timeline detection and proper UI branching
-
 resolve = Resolve()
 projectManager = resolve:GetProjectManager()
 project = projectManager:GetCurrentProject()
@@ -17,23 +17,27 @@ local is_timeline_context = false
 if timeline then
     local video_tracks = timeline:GetTrackCount("video")
     local audio_tracks = timeline:GetTrackCount("audio")
-    
+
     for track = 1, video_tracks do
         local items = timeline:GetItemListInTrack("video", track)
-        if items then timeline_item_count = timeline_item_count + #items end
+        if items then
+            timeline_item_count = timeline_item_count + #items
+        end
     end
-    
+
     -- Also check audio tracks for audio-only clips
     for track = 1, audio_tracks do
         local items = timeline:GetItemListInTrack("audio", track)
         if items then
             for _, item in ipairs(items) do
                 local media_item = item:GetMediaPoolItem()
-                if media_item then timeline_item_count = timeline_item_count + 1 end
+                if media_item then
+                    timeline_item_count = timeline_item_count + 1
+                end
             end
         end
     end
-    
+
     is_timeline_context = timeline_item_count > 0
 end
 
@@ -44,7 +48,7 @@ local context_type = ""
 if is_timeline_context then
     context_type = "timeline"
     print("Timeline context detected: " .. timeline:GetName() .. " with " .. timeline_item_count .. " items")
-    
+
     -- Get timeline clips
     local video_tracks = timeline:GetTrackCount("video")
     for track = 1, video_tracks do
@@ -66,7 +70,7 @@ if is_timeline_context then
 elseif selected_clips and #selected_clips > 0 then
     context_type = "media_pool"
     print("Media Pool context detected with " .. #selected_clips .. " selected clips")
-    
+
     -- Get media pool clips
     for _, clip in ipairs(selected_clips) do
         table.insert(working_clips, {
@@ -87,30 +91,46 @@ print("Working with " .. #working_clips .. " clips in " .. context_type .. " con
 function extract_shot_name_from_path(file_path)
     local file_name = file_path:match("([^\\/]+)%.[^\\/]+$") or file_path
     local shot_name = file_name:match("([Ss][Hh][Oo][Tt]_?%d+)")
-    if shot_name then return shot_name:upper() end
+    if shot_name then
+        return shot_name:upper()
+    end
     shot_name = file_name:match("SEQ%d+_([Ss][Hh]%d+)")
-    if shot_name then return shot_name:upper() end
+    if shot_name then
+        return shot_name:upper()
+    end
     shot_name = file_name:match("([Ss][Hh]_?%d+)")
-    if shot_name then return shot_name:upper() end
+    if shot_name then
+        return shot_name:upper()
+    end
     shot_name = file_name:match("^(%d+)_")
-    if shot_name then return "SH" .. shot_name end
+    if shot_name then
+        return "SH" .. shot_name
+    end
     return nil
 end
 
 function extract_scene_name_from_path(file_path)
     local file_name = file_path:match("([^\\/]+)%.[^\\/]+$") or file_path
     local scene_name = file_name:match("^(.-)_[Ss][Hh]_?%d+")
-    if scene_name and scene_name ~= "" then return scene_name end
+    if scene_name and scene_name ~= "" then
+        return scene_name
+    end
     scene_name = file_name:match("^(.-)_[Ss][Hh][Oo][Tt]_?%d+")
-    if scene_name and scene_name ~= "" then return scene_name end
+    if scene_name and scene_name ~= "" then
+        return scene_name
+    end
     scene_name = file_name:match("^(.-)_[Ss][Hh]%d+")
-    if scene_name and scene_name ~= "" then return scene_name end
+    if scene_name and scene_name ~= "" then
+        return scene_name
+    end
     return nil
 end
 
 function extract_version_for_take(clip)
     local version_num, v_char, _, version_str = get_version_from_clip(clip)
-    if version_num then return version_str end
+    if version_num then
+        return version_str
+    end
     return nil
 end
 
@@ -123,7 +143,9 @@ end
 
 function find_plate_clip_in_media_pool(comp_clip)
     local comp_path = comp_clip:GetClipProperty("File Path")
-    if not comp_path then return nil end
+    if not comp_path then
+        return nil
+    end
 
     local plate_path = find_plate_sequence_path(comp_path)
 
@@ -178,12 +200,14 @@ function validate_plate_duration(comp_clip, plate_clip, verbose)
     end
 
     if comp_duration == plate_duration then
-        if verbose then print("Duration match - safe to transfer timecode") end
+        if verbose then
+            print("Duration match - safe to transfer timecode")
+        end
         return true
     else
         if verbose then
-            print("WARNING: Duration mismatch! Plate (" .. tostring(plate_duration) ..
-                ") and comp (" .. tostring(comp_duration) .. ") have different durations.")
+            print("WARNING: Duration mismatch! Plate (" .. tostring(plate_duration) .. ") and comp (" ..
+                      tostring(comp_duration) .. ") have different durations.")
             print("Skipping timecode transfer to prevent incorrect timecode.")
         end
         return false
@@ -215,30 +239,44 @@ function get_plate_metadata(comp_clip, verbose)
 end
 
 function compare_timecode_plate_vs_comp(comp_clip, verbose)
-    if verbose then print("Starting timecode comparison for: " .. comp_clip:GetName()) end
+    if verbose then
+        print("Starting timecode comparison for: " .. comp_clip:GetName())
+    end
 
     local plate_clip = find_plate_clip_in_media_pool(comp_clip)
 
     if not plate_clip then
-        if verbose then print("No plate sequence found for timecode comparison: " .. comp_clip:GetName()) end
+        if verbose then
+            print("No plate sequence found for timecode comparison: " .. comp_clip:GetName())
+        end
         return false
     end
 
-    if verbose then print("Found plate clip: " .. plate_clip:GetName()) end
+    if verbose then
+        print("Found plate clip: " .. plate_clip:GetName())
+    end
 
     if not validate_plate_duration(comp_clip, plate_clip, false) then
-        if verbose then print("Duration mismatch - skipping timecode comparison for: " .. comp_clip:GetName()) end
+        if verbose then
+            print("Duration mismatch - skipping timecode comparison for: " .. comp_clip:GetName())
+        end
         return false
     end
 
-    if verbose then print("Durations match, comparing timecode...") end
+    if verbose then
+        print("Durations match, comparing timecode...")
+    end
 
-    local tc_properties = { "Start TC", "End TC", "Start Timecode", "End Timecode" }
+    local tc_properties = {"Start TC", "End TC", "Start Timecode", "End Timecode"}
     local timecode_differs = false
 
     for _, prop in ipairs(tc_properties) do
-        local success_comp, comp_value = pcall(function() return comp_clip:GetClipProperty(prop) end)
-        local success_plate, plate_value = pcall(function() return plate_clip:GetClipProperty(prop) end)
+        local success_comp, comp_value = pcall(function()
+            return comp_clip:GetClipProperty(prop)
+        end)
+        local success_plate, plate_value = pcall(function()
+            return plate_clip:GetClipProperty(prop)
+        end)
 
         if verbose then
             print("Checking property: " .. prop)
@@ -246,8 +284,7 @@ function compare_timecode_plate_vs_comp(comp_clip, verbose)
             print("  Plate success: " .. tostring(success_plate) .. ", value: " .. tostring(plate_value))
         end
 
-        if success_comp and success_plate and comp_value and plate_value and
-            comp_value ~= "" and plate_value ~= "" then
+        if success_comp and success_plate and comp_value and plate_value and comp_value ~= "" and plate_value ~= "" then
             if comp_value ~= plate_value then
                 timecode_differs = true
                 if verbose then
@@ -277,7 +314,9 @@ end
 function update_clip_metadata(media_pool_item, verbose, use_plate_metadata, check_timecode_differences)
     local file_path = media_pool_item:GetClipProperty("File Path")
     if not file_path then
-        if verbose then print("No file path found for clip: " .. media_pool_item:GetName()) end
+        if verbose then
+            print("No file path found for clip: " .. media_pool_item:GetName())
+        end
         return false
     end
 
@@ -291,10 +330,14 @@ function update_clip_metadata(media_pool_item, verbose, use_plate_metadata, chec
         local plate_metadata, plate_clip = get_plate_metadata(media_pool_item, verbose)
         if next(plate_metadata) then
             current_metadata = plate_metadata
-            if verbose then print("Using plate metadata for: " .. media_pool_item:GetName()) end
+            if verbose then
+                print("Using plate metadata for: " .. media_pool_item:GetName())
+            end
         else
             current_metadata = media_pool_item:GetMetadata() or {}
-            if verbose then print("No plate found or duration mismatch, using current metadata for: " .. media_pool_item:GetName()) end
+            if verbose then
+                print("No plate found or duration mismatch, using current metadata for: " .. media_pool_item:GetName())
+            end
         end
     else
         current_metadata = media_pool_item:GetMetadata() or {}
@@ -308,7 +351,8 @@ function update_clip_metadata(media_pool_item, verbose, use_plate_metadata, chec
         if success and has_timecode_differences then
             media_pool_item:SetClipColor("Brown")
             if verbose then
-                print("Set clip color to BROWN due to timecode differences between plate and comp: " .. media_pool_item:GetName())
+                print("Set clip color to BROWN due to timecode differences between plate and comp: " ..
+                          media_pool_item:GetName())
             end
         elseif not success and verbose then
             print("Error checking timecode differences for: " .. media_pool_item:GetName())
@@ -325,19 +369,25 @@ function update_clip_metadata(media_pool_item, verbose, use_plate_metadata, chec
     if scene_name then
         metadata_to_set["Scene"] = scene_name
         updated = true
-        if verbose then print("Set Scene metadata: " .. scene_name .. " for " .. media_pool_item:GetName()) end
+        if verbose then
+            print("Set Scene metadata: " .. scene_name .. " for " .. media_pool_item:GetName())
+        end
     end
 
     if shot_name then
         metadata_to_set["Shot"] = shot_name
         updated = true
-        if verbose then print("Set Shot metadata: " .. shot_name .. " for " .. media_pool_item:GetName()) end
+        if verbose then
+            print("Set Shot metadata: " .. shot_name .. " for " .. media_pool_item:GetName())
+        end
     end
 
     if take_version then
         metadata_to_set["Take"] = take_version
         updated = true
-        if verbose then print("Set Take metadata: " .. take_version .. " for " .. media_pool_item:GetName()) end
+        if verbose then
+            print("Set Take metadata: " .. take_version .. " for " .. media_pool_item:GetName())
+        end
     end
 
     if updated then
@@ -394,23 +444,27 @@ end
 
 function set_version_on_clip(clip_data, version_num, verbose, use_plate_metadata, check_timecode_differences)
     local media_pool_item = clip_data.media_pool_item
-    
+
     if verbose then
         print("Processing " .. clip_data.context .. " clip: " .. clip_data.clip_name)
     end
-    
+
     local path = media_pool_item:GetClipProperty("File Path")
-    if not path then 
-        if verbose then print("No file path found for clip") end
-        return false 
+    if not path then
+        if verbose then
+            print("No file path found for clip")
+        end
+        return false
     end
-    
+
     local curr_version, v_char, version_length, version_str = get_version_from_clip(media_pool_item)
-    if not curr_version then 
-        if verbose then print("No version found in file path") end
-        return false 
+    if not curr_version then
+        if verbose then
+            print("No version found in file path")
+        end
+        return false
     end
-    
+
     local new_version_str = v_char .. string.format("%0" .. tostring(version_length) .. "d", version_num)
     local new_path = modify_path_for_replacement_clip(string.gsub(path, v_char .. version_str, new_version_str))
 
@@ -429,8 +483,8 @@ function set_version_on_clip(clip_data, version_num, verbose, use_plate_metadata
         assign_clip_color(media_pool_item, check_timecode_differences)
         update_clip_metadata(media_pool_item, verbose, use_plate_metadata, check_timecode_differences)
 
-        if verbose then 
-            print("SUCCESS: Clip updated to version: " .. version_num .. " -> " .. new_name) 
+        if verbose then
+            print("SUCCESS: Clip updated to version: " .. version_num .. " -> " .. new_name)
         end
     elseif verbose then
         print("FAILED: Could not switch clip to: " .. new_path)
@@ -442,18 +496,21 @@ end
 function get_available_versions_for_clip(clip_data)
     local media_pool_item = clip_data.media_pool_item
     local original_version, v_char, version_length, version_str = get_version_from_clip(media_pool_item)
-    if not original_version then return {} end
-    
+    if not original_version then
+        return {}
+    end
+
     local versions, checked = {}, {}
     local path = media_pool_item:GetClipProperty("File Path")
-    
+
     for offset = 0, 50 do
-        for _, dir in ipairs({ 1, -1 }) do
+        for _, dir in ipairs({1, -1}) do
             local v = original_version + offset * dir
             if v >= 0 and not checked[v] then
                 checked[v] = true
                 local new_version_str = v_char .. string.format("%0" .. version_length .. "d", v)
-                local test_path = modify_path_for_replacement_clip(string.gsub(path, v_char .. version_str, new_version_str))
+                local test_path = modify_path_for_replacement_clip(
+                    string.gsub(path, v_char .. version_str, new_version_str))
                 local file = io.open(test_path, "r")
                 if file then
                     file:close()
@@ -478,7 +535,8 @@ for _, clip_data in ipairs(working_clips) do
     local index = 1
     for i, v in ipairs(versions) do
         if v == current_version then
-            index = i; break
+            index = i;
+            break
         end
     end
     clip_version_index[clip_data] = index
@@ -487,7 +545,9 @@ end
 
 function max_version_on_clip(clip_data, verbose, use_plate_metadata, check_timecode_differences)
     local versions = clip_version_cache[clip_data]
-    if not versions or #versions == 0 then return nil end
+    if not versions or #versions == 0 then
+        return nil
+    end
 
     local max_cached = versions[#versions]
     if set_version_on_clip(clip_data, max_cached, verbose, use_plate_metadata, check_timecode_differences) then
@@ -521,7 +581,9 @@ end
 
 function min_version_on_clip(clip_data, verbose, use_plate_metadata, check_timecode_differences)
     local versions = clip_version_cache[clip_data]
-    if not versions or #versions == 0 then return nil end
+    if not versions or #versions == 0 then
+        return nil
+    end
 
     local min_version = versions[1]
     if set_version_on_clip(clip_data, min_version, verbose, use_plate_metadata, check_timecode_differences) then
@@ -535,7 +597,7 @@ function get_version_report(clips)
     local report_lines = {}
     for _, clip_data in ipairs(clips) do
         local media_pool_item = clip_data.media_pool_item
-        
+
         local version_num, _, _, version_str = get_version_from_clip(media_pool_item)
         if version_num then
             local color_indicator = version_num == 0 and " (Apricot)" or " (Violet)"
@@ -552,15 +614,15 @@ function get_version_report(clips)
             local shot_meta = metadata["Shot"] or "No Shot"
             local scene_meta = metadata["Scene"] or "No Scene"
             local take_meta = metadata["Take"] or "No Take"
-            
-            local clip_display = clip_data.context == "timeline" and 
-                string.format("Timeline: %s | MediaPool: %s", clip_data.timeline_item:GetName(), media_pool_item:GetName()) or
-                string.format("MediaPool: %s", media_pool_item:GetName())
-            
+
+            local clip_display = clip_data.context == "timeline" and
+                                     string.format("Timeline: %s | MediaPool: %s", clip_data.timeline_item:GetName(),
+                    media_pool_item:GetName()) or string.format("MediaPool: %s", media_pool_item:GetName())
+
             table.insert(report_lines,
-                string.format("%s\n  Current Version: %s%s\n  Scene: %s | Shot: %s | Take: %s",
-                    clip_display, version_str, color_indicator, scene_meta, shot_meta, take_meta))
-            
+                string.format("%s\n  Current Version: %s%s\n  Scene: %s | Shot: %s | Take: %s", clip_display,
+                    version_str, color_indicator, scene_meta, shot_meta, take_meta))
+
             local versions = clip_version_cache[clip_data]
             if #versions > 0 then
                 table.insert(report_lines, "  Available Versions: " .. table.concat(versions, ", "))
@@ -616,8 +678,8 @@ function get_simplified_report(clips)
 
     return string.format(
         "%s Clips: %d\nVersioned Clips: %d\nApricot (v000): %d | Violet (v001+): %d | Brown (TC Diff): %d\nWith Scene: %d | Shot: %d | Take: %d",
-        context_type:upper(), clip_count, versioned_clips, apricot_clips, violet_clips, brown_clips, clips_with_scene, clips_with_shot,
-        clips_with_take)
+        context_type:upper(), clip_count, versioned_clips, apricot_clips, violet_clips, brown_clips, clips_with_scene,
+        clips_with_shot, clips_with_take)
 end
 
 -- Create UI based on context and clip count
@@ -636,46 +698,84 @@ end
 
 local window_content
 if use_simplified_gui then
-    window_content = ui:VGroup {
-        ui:Label { ID = "labeltext", Text = get_simplified_report(working_clips) },
-        ui:CheckBox { ID = "usePlateMetadata", Text = "Use plate metadata (duration match required)", Checked = true },
-        ui:CheckBox { ID = "checkTimecodeChanges", Text = "Check plate vs comp timecode (brown if different)", Checked = true },
-        ui:HGroup {
-            ui:Button { ID = "versionDownButton", Text = "Version Down" },
-            ui:Button { ID = "versionUpButton", Text = "Version Up" }
-        },
-        ui:Button { ID = "maxVersionButton", Text = "Maximize Version" },
-        ui:Button { ID = "minVersionButton", Text = "Minimize Version" },
-        ui:Button { ID = "refreshColorsButton", Text = "Refresh Colors" },
-        ui:Button { ID = "closeButton", Text = "Close" }
-    }
+    window_content = ui:VGroup{ui:Label{
+        ID = "labeltext",
+        Text = get_simplified_report(working_clips)
+    }, ui:CheckBox{
+        ID = "usePlateMetadata",
+        Text = "Use plate metadata (duration match required)",
+        Checked = true
+    }, ui:CheckBox{
+        ID = "checkTimecodeChanges",
+        Text = "Check plate vs comp timecode (brown if different)",
+        Checked = true
+    }, ui:HGroup{ui:Button{
+        ID = "versionDownButton",
+        Text = "Version Down"
+    }, ui:Button{
+        ID = "versionUpButton",
+        Text = "Version Up"
+    }}, ui:Button{
+        ID = "maxVersionButton",
+        Text = "Maximize Version"
+    }, ui:Button{
+        ID = "minVersionButton",
+        Text = "Minimize Version"
+    }, ui:Button{
+        ID = "refreshColorsButton",
+        Text = "Refresh Colors"
+    }, ui:Button{
+        ID = "closeButton",
+        Text = "Close"
+    }}
 else
-    window_content = ui:VGroup {
-        ui:Label { ID = "labeltext", Text = context_type:upper() .. " Clips\n" .. get_version_report(working_clips) },
-        ui:CheckBox { ID = "usePlateMetadata", Text = "Use plate metadata (duration match required)", Checked = true },
-        ui:CheckBox { ID = "checkTimecodeChanges", Text = "Check plate vs comp timecode (brown if different)", Checked = true },
-        ui:HGroup {
-            ui:Button { ID = "versionDownButton", Text = "Version Down" },
-            ui:Button { ID = "versionUpButton", Text = "Version Up" }
-        },
-        ui:Button { ID = "maxVersionButton", Text = "Maximize Version" },
-        ui:Button { ID = "minVersionButton", Text = "Minimize Version" },
-        ui:Button { ID = "refreshColorsButton", Text = "Refresh Colors" },
-        ui:Button { ID = "closeButton", Text = "Close" }
-    }
+    window_content = ui:VGroup{ui:Label{
+        ID = "labeltext",
+        Text = context_type:upper() .. " Clips\n" .. get_version_report(working_clips)
+    }, ui:CheckBox{
+        ID = "usePlateMetadata",
+        Text = "Use plate metadata (duration match required)",
+        Checked = true
+    }, ui:CheckBox{
+        ID = "checkTimecodeChanges",
+        Text = "Check plate vs comp timecode (brown if different)",
+        Checked = true
+    }, ui:HGroup{ui:Button{
+        ID = "versionDownButton",
+        Text = "Version Down"
+    }, ui:Button{
+        ID = "versionUpButton",
+        Text = "Version Up"
+    }}, ui:Button{
+        ID = "maxVersionButton",
+        Text = "Maximize Version"
+    }, ui:Button{
+        ID = "minVersionButton",
+        Text = "Minimize Version"
+    }, ui:Button{
+        ID = "refreshColorsButton",
+        Text = "Refresh Colors"
+    }, ui:Button{
+        ID = "closeButton",
+        Text = "Close"
+    }}
 end
 
 local win = disp:AddWindow({
     ID = "MyWin",
     WindowTitle = window_title,
-    Geometry = { 100, 100, width, height },
+    Geometry = {100, 100, width, height},
     window_content
 })
 
 local itm = win:GetItems()
 
-function win.On.MyWin.Close() disp:ExitLoop() end
-function win.On.closeButton.Clicked() disp:ExitLoop() end
+function win.On.MyWin.Close()
+    disp:ExitLoop()
+end
+function win.On.closeButton.Clicked()
+    disp:ExitLoop()
+end
 
 function win.On.refreshColorsButton.Clicked()
     local check_timecode = itm.checkTimecodeChanges.Checked
@@ -683,7 +783,7 @@ function win.On.refreshColorsButton.Clicked()
     for _, clip_data in ipairs(working_clips) do
         assign_clip_color(clip_data.media_pool_item, check_timecode)
     end
-    
+
     if use_simplified_gui then
         itm.labeltext.Text = get_simplified_report(working_clips)
     else
@@ -700,7 +800,7 @@ function win.On.maxVersionButton.Clicked()
     for _, clip_data in ipairs(working_clips) do
         max_version_on_clip(clip_data, true, use_plate, check_timecode)
     end
-    
+
     if use_simplified_gui then
         itm.labeltext.Text = get_simplified_report(working_clips)
     else
@@ -716,7 +816,7 @@ function win.On.minVersionButton.Clicked()
     for _, clip_data in ipairs(working_clips) do
         min_version_on_clip(clip_data, true, use_plate, check_timecode)
     end
-    
+
     if use_simplified_gui then
         itm.labeltext.Text = get_simplified_report(working_clips)
     else
@@ -740,7 +840,7 @@ function win.On.versionUpButton.Clicked()
             end
         end
     end
-    
+
     if use_simplified_gui then
         itm.labeltext.Text = get_simplified_report(working_clips)
     else
@@ -764,7 +864,7 @@ function win.On.versionDownButton.Clicked()
             end
         end
     end
-    
+
     if use_simplified_gui then
         itm.labeltext.Text = get_simplified_report(working_clips)
     else
