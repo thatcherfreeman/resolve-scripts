@@ -733,8 +733,23 @@ if get_exif_tags and generate_matrix then
         camera_to_pcs)
 
     -- Matrix from XYZ to target primaries
+    -- Note: The commented out method below assumes that Resolve applied the wrong white balance
+    -- gains and that we invert them, then apply the correct matrix.
     local camera_to_dwg = multiply(get_XYZ_to_rgb_matrix(target_primaries),
         multiply(camera_to_xyz_wp_adapted, diagonal(exif_tags['AsShotNeutral'])))
+
+    if itm.outputWB.CurrentText ~= "Current WB" then
+        -- In practice, we want to imagine that Resolve has already applied the Right white balance
+        -- gains to get to the selected white balance, IE imagine that we're already gained so that
+        -- D65 is set to (1,1,1). We must therefore alter the as shot neutral white balance correction
+        -- so that the resulting matrix preserves the white point.
+        local camera_raw_to_dwg = multiply(get_XYZ_to_rgb_matrix(target_primaries), camera_to_xyz_wp_adapted)
+        local white_balance_gains = multiply(inverse(camera_raw_to_dwg), {1.0, 1.0, 1.0})
+        print("Overwrote Resolve White Balance Gains to: ")
+        print_table({white_balance_gains[1], white_balance_gains[2], white_balance_gains[3]})
+        camera_to_dwg = multiply(camera_raw_to_dwg, diagonal(white_balance_gains))
+    end
+
     print(string.format("Camera to %s: ", itm.outputGamut.CurrentText))
 
     -- Overall exposure adjustment so that the sum of the matrix is 3.0
