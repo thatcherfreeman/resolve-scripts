@@ -1,8 +1,8 @@
-Updated as of 25 August, 2020
----------------------------
+Updated as of 3 October, 2024
+-----------------------------
 In this package, you will find a brief introduction to the Workflow Integration Plugins support for DaVinci Resolve Studio. Apart from this README.txt file, this package contains following folders:
-Examples: containing some representative sample plugin, and a sample script.
-Scripts: containing some sample workflow scripts to interact with Resolve.
+Examples: containing some representative sample plugins (Electron), and a sample script (Python).
+Scripts: containing some sample scripts (JavaScript) to interact with Resolve.
 
 Overview
 --------
@@ -11,18 +11,54 @@ Users can write their own Workflow Integration Plugin (an Electron app) which co
 
 Alternatively, a Python or Lua script can be invoked, with the option of a user interface built with Resolve's built-in Qt-based UIManager, or with an external GUI manager. See the "Sample Workflow Integration Script" section below for details.
 
+NOTE:
+- Starting with v19.0.2, DaVinci Resolve uses a newer version of Electron that enforces process sandboxing and context isolation by default.
+- Existing third-party Workflow Integration plugin developers should audit their plugin implementation against these limitations and update them as required.
+- Update "WorkflowIntegration.node" in your plugin to get the latest improvements and bug fixes. The latest version can be found alongside this document, in "Examples/SamplePlugin/".
+- In order to assist third-party developers, a sample plugin has been added in the CompatibleSamplePlugin/ folder to demonstrate the code needed to make non-sandboxed plugins work with the new version of Electron.
+- Please refer to the following Electron tutorials:
+  https://www.electronjs.org/docs/latest/tutorial/sandbox
+  https://www.electronjs.org/docs/latest/tutorial/context-isolation
+  https://www.electronjs.org/docs/latest/tutorial/ipc
+  https://www.electronjs.org/docs/tutorial/security
 
-Sample Workflow Integration Plugin
-----------------------------------
-A sample Workflow Integration Plugin is available in the "Examples/SamplePlugin" directory. In order for Resolve to register this plugin, this directory needs to be copied to 'Workflow Integration Plugins' root directory (mentioned in below section).
+Sample Workflow Integration Plugins
+-----------------------------------
+Sample Workflow Integration plugins helps to understand how a plugin should be structured and how it works with Resolve. Please refer to the directory/file structure, manifest file info, plugin loading, JavaScript API usage examples, etc.
+Below sample plugins demonstrate few basic scriptable JavaScript API usages to interact with Resolve.
+
+1. Sample Workflow Integration Plugin
+   a. Demonstrates some basic functions that can be performed in DaVinci Resolve using the scripting APIs.
+   b. Uses latest Electron process sandboxed model and context isolation in the plugin implementation, recommended for plugin writers.
+   c. Available in the "Examples/SamplePlugin" directory.
+
+2. Sample Workflow Integration Plugin (Promise apis)
+   a. Demonstrates the usages of scripting promise apis to invoke apis asynchronously.
+   b. Uses latest Electron process sandboxed model and context isolation in the plugin implementation, recommended for plugin writers.
+   c. Available in the "Examples/SamplePromisePlugin" directory.
+
+3. Sample Workflow Integration Plugin (Compatibility Mode)
+   a. A sample plugin to assist plugin developers who have developed plugins for DaVinci Resolve 19.0.1 or older versions and use the legacy non-sandboxed model in their plugin implementation.
+   b. Compatible with old and new Electron versions.
+   c. Demonstrates some basic functions that can be performed in DaVinci Resolve using the scripting APIs.
+   d. Available in the "Examples/CompatibleSamplePlugin" directory.
+   e. The non-sandboxed approach is not recommended by Electron and the example is only meant to demonstrate how an existing plugin can be easily modified to work with the new version of Electron.
+   f. In particular, note the following settings in "Examples/CompatibleSamplePlugin/main.js":
+      - nodeIntegration
+      - contextIsolation
+   g. Also refer to "Examples/CompatibleSamplePlugin/preload.js" to see how "WorkflowIntegration.node" is loaded and Resolve scripting APIs are accessed.
+
+4. Script Test Workflow Integration Plugin
+   a. To run, test or simulate workflows using scripts.
+   b. There are few Workflow Integrations sample scripts present in the "Scripts" folder which could be run using this plugin.
+   c. Available in the "Examples/ScriptTestPlugin" directory.
+
+In order for Resolve to register these plugins, their corresponding directory needs to be copied to "Workflow Integration Plugins" root directory (mentioned in below section).
 Once a plugin is registered, plugin can be loaded from UI sub-menu under 'Workspace->Workflow Integrations'. This will load the plugin and show the plugin HTML page in a separate window.
-
-Sample plugin helps to understand how a plugin should be structured and how it works with Resolve. Please refer to the directory/file structure, manifest file info, plugin loading, JavaScript API usage examples, etc.
-This sample plugin and scripts demonstrates few basic scriptable JavaScript API usages to interact with Resolve.
 
 Loading Workflow Integration Plugin
 -----------------------------------
-On startup, DaVinci Resolve Studio scans the Workflow Integration Plugins root directory and enumerates all plugin modules. For each valid plugin module, it creates a UI sub-menu entry under 'Workspace->Workflow Integrations' menu.
+On startup, DaVinci Resolve Studio scans the "Workflow Integration Plugins" root directory and enumerates all plugin modules. For each valid plugin module, it creates a UI sub-menu entry under 'Workspace->Workflow Integrations' menu.
 DaVinci Resolve Studio reads the basic details of the plugin from its manifest.xml file during load time. Once plugin is loaded, user can click on the 'Workflow Integrations' sub-menu to load the corresponding plugin.
 
 Workflow Integration Plugin directory structure
@@ -68,14 +104,19 @@ This example JavaScript snippet creates a simple project in DaVinci Resolve Stud
     }
 
 The resolve object is the fundamental starting point for scripting via Resolve. As a native object, it can be inspected for further scriptable properties and functions in JavaScript.
+There are few sample scripts available in the "Examples/Scripts" directory to demonstrate scriptable JavaScript APIs usages to interact with Resolve.
 
 WorkflowIntegration module API
 -------------------------------
 To interact with Resolve you need to use 'WorkflowIntegration.node' Node.js module file in your plugin app. Below are the WorkflowIntegration (module) JavaScript API functions to communicate with Resolve.
 
 WorkflowIntegration
+  GetInfo()                                       --> Object             # Returns an object containing following module information:
+                                                                           - version : string containing WorkflowIntegration module version (example: '2.0.0')
   Initialize(<pluginId>)                          --> Bool               # Returns true if initialization is successful, false otherwise. <pluginId> is the unique plugin id string configured in the manifest.xml file.
+  InitializePromise(<pluginId>)                   --> <Promise>          # Fulfills upon successful initialization with true, false otherwise. <pluginId> is the unique plugin id string configured in the manifest.xml file.
   GetResolve()                                    --> Resolve            # Returns Resolve object.
+  GetResolvePromise()                             --> <Promise>          # Fulfills upon success with Resolve object. All further calls to the returned Resolve object will, in turn, return the promise objects.
   RegisterCallback(callbackName, callbackFunc)    --> Bool               # Returns true if input callback name/function is registered successfully, false otherwise.
                                                                          # 'callbackName' should be a valid supported callback string name (refer to the below section 'Supported callbacks').
                                                                          # 'callbackFunc' should be a valid JavaScript function without any arguments.
@@ -88,6 +129,7 @@ Supported callbacks
 -------------------
 'RenderStart'
 'RenderStop'
+'ResolveQuit'
 
 Please note that there is no console based support for JavaScript API.
 
