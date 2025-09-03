@@ -1,5 +1,5 @@
-Last Updated: 28 October 2024
------------------------------
+Last Updated: 6 Jun 2025
+------------------------
 In this package, you will find a brief introduction to the Scripting API for DaVinci Resolve Studio. Apart from this README.txt file, this package contains folders containing the basic import
 modules for scripting access (DaVinciResolve.py) and some representative examples.
 
@@ -296,8 +296,10 @@ MediaPoolItem
                                                                          # If no argument is specified, a dict of all clip properties is returned. Check the section below for more information.
   SetClipProperty(propertyName, propertyValue)    --> Bool               # Sets the given property to propertyValue (string). Check the section below for more information.
   LinkProxyMedia(proxyMediaFilePath)              --> Bool               # Links proxy media located at path specified by arg 'proxyMediaFilePath' with the current clip. 'proxyMediaFilePath' should be absolute clip path.
+  LinkFullResolutionMedia(fullResMediaPath)       --> Bool               # Links proxy media to full resolution media files specified via its path.
   UnlinkProxyMedia()                              --> Bool               # Unlinks any proxy media associated with clip.
   ReplaceClip(filePath)                           --> Bool               # Replaces the underlying asset and metadata of MediaPoolItem with the specified absolute clip path.
+  ReplaceClipPreserveSubClip(filePath)            --> Bool               # Replaces the underlying asset and metadata of a video or audio clip with the specified absolute clip path, preserving original sub clip extents.
   GetUniqueId()                                   --> string             # Returns a unique ID for the media pool item
   TranscribeAudio()                               --> Bool               # Transcribes audio of the MediaPoolItem. Returns True if successful; False otherwise
   ClearTranscription()                            --> Bool               # Clears audio transcription of the MediaPoolItem. Returns True if successful; False otherwise.
@@ -306,6 +308,7 @@ MediaPoolItem
                                                                          # {'video': {'in': 0, 'out': 134}, 'audio': {'in': 0, 'out': 134}}
   SetMarkInOut(in, out, type="all")               --> Bool               # Sets mark in/out of type "video", "audio" or "all" (default).
   ClearMarkInOut(type="all")                      --> Bool               # Clears mark in/out of type "video", "audio" or "all" (default).
+  MonitorGrowingFile()                            --> Bool               # Monitor a file as long as it keeps growing (stops if the file does not grow for some time).
 
 Timeline
   GetName()                                       --> string             # Returns the timeline name.
@@ -400,6 +403,8 @@ Timeline
                                                                          # {'video': {'in': 0, 'out': 134}, 'audio': {'in': 0, 'out': 134}}
   SetMarkInOut(in, out, type="all")               --> Bool               # Sets mark in/out of type "video", "audio" or "all" (default).
   ClearMarkInOut(type="all")                      --> Bool               # Clears mark in/out of type "video", "audio" or "all" (default).
+  GetVoiceIsolationState(trackIndex)              --> {VoiceIsolationState} # Returns the Voice Isolation State as a dict {isEnabled, amount}, of the given track index
+  SetVoiceIsolationState(trackIndex, {VoiceIsolationState}) --> Bool      # Sets Voice Isolation state of audio track with given trackIndex (int) to the given VoiceIsolationState of {isEnabled (bool), amount (int)}. amount is in range of [0, 100] and 1 <= trackIndex <= GetTrackCount("audio"). Returns True if successful.
 
 TimelineItem
   GetName()                                       --> string             # Returns the item name.
@@ -487,6 +492,8 @@ TimelineItem
   GetIsFusionOutputCacheEnabled()                 --> cache_value        # Returns if the cache corresponding to cache_type is enabled (or auto)
   SetColorOutputCache(cache_value)                --> Bool               # Sets caching to enabled or disabled. Equivalent to clip context menu action 'Render Cache Color Output'.
   SetFusionOutputCache(cache_value)               --> Bool               # Sets caching to auto, enabled or disabled. Equivalent to clip context menu action 'Render Cache Fusion Output'.
+  GetVoiceIsolationState()                        --> {VoiceIsolationState} # Returns the Voice Isolation State as a dict {isEnabled, amount}, of the timelineItem
+  SetVoiceIsolationState({VoiceIsolationState})    --> Bool               # Sets Voice Isolation state of the timelineItem to the given VoiceIsolationState of {isEnabled (bool), amount (int)}. amount is in range of [0, 100]. Returns True if successful.
 
 Gallery
   GetAlbumName(galleryStillAlbum)                 --> string              # Returns the name of the GalleryStillAlbum object 'galleryStillAlbum'.
