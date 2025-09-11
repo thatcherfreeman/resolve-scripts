@@ -1,5 +1,5 @@
-Last Updated: 6 Jun 2025
-------------------------
+Last Updated: 18 Aug 2025
+-------------------------
 In this package, you will find a brief introduction to the Scripting API for DaVinci Resolve Studio. Apart from this README.txt file, this package contains folders containing the basic import
 modules for scripting access (DaVinciResolve.py) and some representative examples.
 
@@ -266,6 +266,7 @@ Folder
 
 MediaPoolItem
   GetName()                                       --> string             # Returns the clip name.
+  SetName(name)                                   --> bool               # Sets the clip's name to name(string). Returns True if successful
   GetMetadata(metadataType=None)                  --> string|dict        # Returns the metadata value for the key 'metadataType'.
                                                                          # If no argument is specified, a dict of all set metadata properties is returned.
   SetMetadata(metadataType, metadataValue)        --> Bool               # Sets the given metadata to metadataValue (string). Returns True if successful.
@@ -408,6 +409,7 @@ Timeline
 
 TimelineItem
   GetName()                                       --> string             # Returns the item name.
+  SetName(name)                                   --> bool               # Sets the clip's name to name(string). Returns True if successful
   GetDuration(subframe_precision)                 --> int/float          # Returns the item duration. Returns fractional frames if subframe_precision is True
   GetEnd(subframe_precision)                      --> int/float          # Returns the end frame position on the timeline. Returns fractional frames if subframe_precision is True
   GetSourceEndFrame()                             --> int                # Returns the end frame position of the media pool clip in the timeline clip.
@@ -487,13 +489,14 @@ TimelineItem
   GetTrackTypeAndIndex()                          --> [trackType, trackIndex] # Returns a list of two values that correspond to the TimelineItem's trackType (string) and trackIndex (int) respectively.
                                                                            # trackType is one of {"audio", "video", "subtitle"}
                                                                            # 1 <= trackIndex <= Timeline.GetTrackCount(trackType)
-  GetSourceAudioChannelMapping()                 --> json formatted string # Returns a string with TimelineItem's audio mapping information. Check 'Audio Mapping' section below for more information.
+  GetSourceAudioChannelMapping()                  --> json formatted string # Returns a string with TimelineItem's audio mapping information. Check 'Audio Mapping' section below for more information.
   GetIsColorOutputCacheEnabled()                  --> cache_value        # Returns if the cache corresponding to cache_type is enabled
   GetIsFusionOutputCacheEnabled()                 --> cache_value        # Returns if the cache corresponding to cache_type is enabled (or auto)
   SetColorOutputCache(cache_value)                --> Bool               # Sets caching to enabled or disabled. Equivalent to clip context menu action 'Render Cache Color Output'.
   SetFusionOutputCache(cache_value)               --> Bool               # Sets caching to auto, enabled or disabled. Equivalent to clip context menu action 'Render Cache Fusion Output'.
   GetVoiceIsolationState()                        --> {VoiceIsolationState} # Returns the Voice Isolation State as a dict {isEnabled, amount}, of the timelineItem
-  SetVoiceIsolationState({VoiceIsolationState})    --> Bool               # Sets Voice Isolation state of the timelineItem to the given VoiceIsolationState of {isEnabled (bool), amount (int)}. amount is in range of [0, 100]. Returns True if successful.
+  SetVoiceIsolationState({VoiceIsolationState})   --> Bool               # Sets Voice Isolation state of the timelineItem to the given VoiceIsolationState of {isEnabled (bool), amount (int)}. amount is in range of [0, 100]. Returns True if successful.
+  ResetAllNodeColors()                            --> Bool               # Reset node color for all nodes in the active version of the clip. Returns True if successful.
 
 Gallery
   GetAlbumName(galleryStillAlbum)                 --> string              # Returns the name of the GalleryStillAlbum object 'galleryStillAlbum'.
@@ -789,6 +792,8 @@ The parameter setting is a dictionary containing the following keys:
     - "ClipStartFrame": int
     - "TimelineStartTimecode": string (example: "01:00:00:00")
     - "ReplaceExistingFilesInPlace": Bool
+    - "ExportSubtitle": Bool
+    - "SubtitleFormat": string (options: "BurnIn", "EmbeddedCaptions", "SeparateFile")
 
 Looking up timeline export properties
 -------------------------------------
