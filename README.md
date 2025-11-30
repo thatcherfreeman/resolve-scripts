@@ -27,6 +27,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
     - [Utility](#utility)
         - [Relink Media Pool Clips](#relink-media-pool-clips)
         - [Remove Empty Bins](#remove-empty-bins)
+        - [Replace Media Pool Clips](#replace-media-pool-clips)
 
 
 # Installation
@@ -115,3 +116,6 @@ To use this, use the following steps:
 
 ### Remove Empty Bins
 Deletes all bins in the media pool that do not contain any clips.
+
+### Replace Media Pool Clips
+I have a problem with one of my projects which I round tripped the proxies through someone else and now all the clips are 4k but resolve thinks they're 2k like their proxies were. This issue would be fixed by replacing every clip in the media pool with itself so that Resolve refreshese its clip properties, so this script automates that.
