@@ -18,6 +18,17 @@ function file_exists(name)
     end
 end
 
+function toggle_extension_case(file_path)
+    -- Handle both Windows (\) and Unix (/) path separators
+    local dir, name, ext = file_path:match("(.-)([^\\/]-%.?)([^%.\\/]*)$")
+    if ext and ext ~= "" then
+        -- Toggle case: if lowercase, make uppercase; if uppercase, make lowercase
+        local toggled_ext = ext:lower() == ext and ext:upper() or ext:lower()
+        return dir .. name .. toggled_ext
+    end
+    return file_path
+end
+
 missing_files = {}
 replace_audio_clips = false
 replace_video_clips = false
@@ -42,9 +53,21 @@ function traverse_clips(mediaPool, folder, dry_run)
 
                 if dry_run == false then
                     -- replace the clip.
-                    print("Replacing clip with same file path...")
+                    print("Replacing clip with file path...")
                     local success = clip:ReplaceClip(file_path)
-                    assert(success, string.format("Could not replace clip %s at %s", clip_name, file_path))
+
+                    if not success then
+                        -- Try with opposite case extension
+                        local alt_file_path = toggle_extension_case(file_path)
+                        print("First attempt failed, trying with alternate case: ", alt_file_path)
+                        success = clip:ReplaceClip(alt_file_path)
+
+                        if success then
+                            print("Success with alternate case!")
+                        end
+                    end
+
+                    assert(success, string.format("Could not replace clip %s at %s (also tried %s)", clip_name, file_path, toggle_extension_case(file_path)))
                 else
                     if file_path == nil or not file_exists(file_path) then
                         print("Could not find file: ", file_path)
