@@ -20,6 +20,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
     - [Comp](#comp)
     - [Edit](#edit)
         - [Copy Timeline Settings](#copy-timeline-settings)
+        - [Gather Clips from XML](#gather-clips-from-xml)
         - [Generate All Clips Timeline](#generate-all-clips-timeline)
         - [Rename Clips](#rename-clips)
         - [Rename Timelines](#rename-timelines)
@@ -80,6 +81,9 @@ Indicate the node id and layer index and this tool will allow you to enable or d
 
 ### Copy Timeline Settings
 Attempts to copy a specified timeline's settings to all timelines in the currently open bin.
+
+### Gather Clips from XML
+Reads a Premiere XML file and makes a timeline with all those clips in their entirety (must already be in the media pool).
 
 ### Generate All Clips Timeline
 Generates a timeline that contains all the video clips used in any timeline in your project, and their original media pool linked audio. Only takes the portion of each file from the first frame that is used in any timeline to the last frame used in any timeline, and everything between those two frames. Allows you to specify the name of the new timeline and whether you want to include disabled clips or not. Doesn't always work right when you have retimed clips.
