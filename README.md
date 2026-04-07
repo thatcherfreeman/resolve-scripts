@@ -16,6 +16,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
         - [Compute DNG Matrix](#compute-dng-matrix)
         - [Export CDLs](#export-cdls)
         - [Print Node Tools](#print-node-tools)
+        - [Stabilize Clips](#stabilize-clips)
         - [Toggle Nodes](#toggle-nodes)
     - [Comp](#comp)
     - [Edit](#edit)
@@ -71,6 +72,9 @@ The script goes through each clip in the timeline in the first track in order an
 
 ### Print Node Tools
 Loops through all the nodes in the group pre-clip, clip, post-clip, and timeline nodes for the current clip in the node tree and prints the tools in each node.
+
+### Stabilize Clips
+Stabilizes all clips with a certain color or on a certain track
 
 ### Toggle Nodes
 Indicate the node id and layer index and this tool will allow you to enable or disable all nodes with that node number.
