@@ -111,7 +111,7 @@ Select some clips in the media pool. This goes through clips whose paths include
 ## Deliver
 
 ### Render Notification
-Works on MacOS, you can set up this script to run at the end of a render job at Deliver Page > Left Sidebar > Video > Advanced > Trigger Script at [End] of render job. Brings up a notification saying the render was completed. Windows implementation not tested yet.
+Works on MacOS, you can set up this script to run at the end of a render job at Deliver Page > Left Sidebar > Video > Advanced > Trigger Script at [End] of render job. Brings up a notification saying the render was completed.
 
 ## Utility
 ### Relink Media Pool Clips
