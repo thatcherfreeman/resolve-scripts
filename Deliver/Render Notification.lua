@@ -4,6 +4,18 @@ end
 
 local time = os.date("%I:%M %p")
 
-if not os.is_windows() then
+if os.is_windows() then
+    local ps = string.format(
+        'start /b "" powershell -WindowStyle Hidden -command "Add-Type -AssemblyName System.Windows.Forms;' ..
+        '$n = New-Object System.Windows.Forms.NotifyIcon;' ..
+        '$n.Icon = [System.Drawing.SystemIcons]::Information;' ..
+        '$n.Visible = $true;' ..
+        '$n.ShowBalloonTip(5000, \'Resolve\', \'Render Finished! Completed at %s\', [System.Windows.Forms.ToolTipIcon]::Info);' ..
+        'Start-Sleep -s 1;' ..
+        '$n.Dispose()"',
+        time
+    )
+    io.popen(ps)
+else
     io.popen("osascript -e 'display notification \"Render Finished!\" with title \"Resolve\" subtitle \"Completed at " .. time .. "\" sound name \"Glass\"'")
 end
