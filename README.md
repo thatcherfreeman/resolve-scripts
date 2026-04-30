@@ -27,6 +27,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
         - [Rename Timelines](#rename-timelines)
         - [Update Version Number](#update-version-number)
     - [Deliver](#deliver)
+        - [Render Notification](#render-notification)
     - [Utility](#utility)
         - [Relink Media Pool Clips](#relink-media-pool-clips)
         - [Remove Empty Bins](#remove-empty-bins)
@@ -108,6 +109,9 @@ Select some clips in the media pool. This goes through clips whose paths include
 
 
 ## Deliver
+
+### Render Notification
+Works on MacOS, you can set up this script to run at the end of a render job at Deliver Page > Left Sidebar > Video > Advanced > Trigger Script at [End] of render job. Brings up a notification saying the render was completed. Windows implementation not tested yet.
 
 ## Utility
 ### Relink Media Pool Clips
