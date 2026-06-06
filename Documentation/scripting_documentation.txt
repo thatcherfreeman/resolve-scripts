@@ -200,9 +200,9 @@ Project
   AddColorGroup(groupName)                        --> ColorGroup         # Creates a new ColorGroup. groupName must be a unique string.
   DeleteColorGroup(colorGroup)                    --> Bool               # Deletes the given color group and sets clips to ungrouped.
   ApplyFairlightPresetToCurrentTimeline(name)     --> Bool               # Apply Fairlight Preset of given name to the current timeline, returns True if successful, False otherwise.
-  ResetIntellisearchAnalysis()                    --> Bool               # Clear Intellisearch Analysis data. Returns True if sucessful.
+  ResetIntellisearchAnalysis()                    --> Bool               # Clears Intellisearch analysis data. Returns True if successful.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  GenerateSpeech({speechGenerationSettings}, timecode) --> MediaPoolItem # Generate a Audio MediaPoolItem based on the speechGenerationSettings given and add it to timeline at the stated timecode if "AddToTimeline" is True. Return newly generated MediaPoolItem.
+  GenerateSpeech({speechGenerationSettings}, timecode) --> MediaPoolItem # Generates an audio MediaPoolItem based on the given speechGenerationSettings and adds it to the timeline at the stated timecode if "AddToTimeline" is True. Returns the newly generated MediaPoolItem.
                                                                          # Refer to section "Speech Generation Settings" for information on supported settings
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
 
@@ -279,12 +279,12 @@ Folder
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
   ClearAudioClassification()                      --> Bool               # Clears audio classification of the MediaPoolItems within the folder and nested folders.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  RemoveMotionBlur({deblurOption})                --> [[MedialPoolItem, MedialPoolItem]...]   # Apply Motion Deblur on MediaPoolItems in Folder, Returns a list of original to newly created MediaPoolItems
+  RemoveMotionBlur({deblurOption})                --> [[MediaPoolItem, MediaPoolItem]...]   # Applies motion deblur on MediaPoolItems in the folder. Returns a list of pairs mapping original to newly created MediaPoolItems.
                                                                          # Refer to section "Motion Deblur Settings" for information on supported settings
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  AnalyzeForIntellisearch(identifyFaces, isBetterMode) --> Bool          # Perform Intellisearch analysis to all the MediaPoolItems in the folder, stating to identify faces and to run in BetterMode. Returns True if required packages are installed and analysis is successful.
+  AnalyzeForIntellisearch(identifyFaces, isBetterMode) --> Bool          # Performs Intellisearch analysis on all MediaPoolItems in the folder. identifyFaces specifies whether to identify faces; isBetterMode specifies whether to use Better mode. Returns True if required packages are installed and analysis is successful.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  AnalyzeForSlate(markerColor)                    --> Bool               # Perform Slate analysis with current settings and use the stated markerColor to all the MediaPoolItems in the folder. Returns True if required packages are installed and analysis is successful.
+  AnalyzeForSlate(markerColor)                    --> Bool               # Performs Slate analysis on all MediaPoolItems in the folder using the current settings and specified markerColor. Returns True if required packages are installed and analysis is successful.
                                                                          # Refer to section "Analyze Slate Settings" for information on markerColor
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
 
@@ -331,7 +331,7 @@ MediaPoolItem
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
   ClearTranscription()                            --> Bool               # Clears audio transcription of the MediaPoolItem. Returns True if successful; False otherwise.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  PerformAudioClassification()                    --> Bool               # Analyzes and classifies the audio of a MedialPoolItem into categories and subcategories.
+  PerformAudioClassification()                    --> Bool               # Analyzes and classifies the audio of a MediaPoolItem into categories and subcategories.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
   ClearAudioClassification()                      --> Bool               # Clears audio classification of the MediaPoolItem.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
@@ -341,12 +341,12 @@ MediaPoolItem
   SetMarkInOut(in, out, type="all")               --> Bool               # Sets mark in/out of type "video", "audio" or "all" (default).
   ClearMarkInOut(type="all")                      --> Bool               # Clears mark in/out of type "video", "audio" or "all" (default).
   MonitorGrowingFile()                            --> Bool               # Monitor a file as long as it keeps growing (stops if the file does not grow for some time).
-  RemoveMotionBlur({deblurOption})                --> MedialPoolItem     # Apply Motion Deblur on MediaPoolItem, Returns newly created MediaPoolItem
+  RemoveMotionBlur({deblurOption})                --> MediaPoolItem      # Applies motion deblur on the MediaPoolItem. Returns the newly created MediaPoolItem.
                                                                          # Refer to section "Motion Deblur Settings" for information on supported settings.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  AnalyzeForIntellisearch(identifyFaces, isBetterMode) --> Bool          # Perform Intellisearch analysis on the MediaPoolItem, stating to identify faces and to run in BetterMode. Returns True if required packages are installed and analysis is successful.
+  AnalyzeForIntellisearch(identifyFaces, isBetterMode) --> Bool          # Performs Intellisearch analysis on the MediaPoolItem. identifyFaces specifies whether to identify faces; isBetterMode specifies whether to use Better mode. Returns True if required packages are installed and analysis is successful.
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
-  AnalyzeForSlate(markerColor)                    --> Bool               # Perform Slate analysis on the MediaPoolItem with current settings and use the stated markerColor. Returns True if required packages are installed and analysis is successful.
+  AnalyzeForSlate(markerColor)                    --> Bool               # Performs Slate analysis on the MediaPoolItem using the current settings and specified markerColor. Returns True if required packages are installed and analysis is successful.
                                                                          # Refer to section "Analyze Slate Settings" for information on markerColor
                                                                          # Refer to section "Studio and AI Scripting APIs" for prerequisites.
 
@@ -998,7 +998,7 @@ Getting the values for the keys that uses constants will return the number which
 
 Studio and AI Scripting APIs
 ----------------------------
-The DaVinci Resolve scripting APIs cover a common superset for functions for both the Free and Studio version of the application.
+The DaVinci Resolve scripting APIs cover a common superset of functions for both the Free and Studio versions of the application.
 
 API calls can return with a False status (or an appropriate error status) when:
 * the function references a Studio function from the free DaVinci Resolve version.
@@ -1063,7 +1063,7 @@ Speech Generation Settings
 -----------------------------------
 This section covers the supported settings for the method GenerateSpeech({speechGenerationSettings}, timecode)
 
-the speechGenerationSettings is a dictionary containing the following keys:
+The speechGenerationSettings is a dictionary containing the following keys:
     - "TextInput": string
     - "VoiceModel": string (example: "Female 1", "Male 1", "Custom Voice").
     - "CustomVoiceFile": string "Full Path of Voice File"
