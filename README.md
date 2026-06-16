@@ -25,6 +25,7 @@ Support me at: [https://www.buymeacoffee.com/thatcherfreeman](https://www.buymea
         - [Generate All Clips Timeline](#generate-all-clips-timeline)
         - [Rename Clips](#rename-clips)
         - [Rename Timelines](#rename-timelines)
+        - [Update Timeline Resolution](#update-timeline-resolution)
         - [Update Version Number](#update-version-number)
     - [Deliver](#deliver)
         - [Render Notification](#render-notification)
@@ -98,6 +99,9 @@ Find and replace clip names within the current media pool bin.
 
 ### Rename Timelines
 Find and replace timeline names within the current bin, and add prefixes or suffixes.
+
+### Update Timeline Resolution
+Updates all timelines in the current media pool bin to have the specified width and height. Note: I can't update timelines where they're set to use the project settings. It can only update timelines where you've unchecked "Use Project Settings" within the timeline settings dialog box.
 
 ### Update Version Number
 Select some clips in the media pool. This goes through clips whose paths include something like "v002" or "V1234" and replaces each selected media pool item with a new version number.
