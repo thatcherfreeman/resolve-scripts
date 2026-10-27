@@ -746,11 +746,13 @@ class QuickExportRenderSettings(TypedDict, total=False):
 
 class QuickExportRenderStatus(TypedDict, total=False):
 	JobStatus: str
-	"""'Render Complete', 'Render Failed', 'Render Cancelled', 'Upload Completed', 'Upload Failed' or 'Upload Cancelled'"""
+	"""'Rendering', 'Render Complete', 'Render Failed', 'Render Cancelled', 'Upload Pending', 'Uploading', 'Upload Completed', 'Upload Failed', 'Upload Cancelled', 'Inactive' or 'Unexpected'"""
 	CompletionPercentage: int
-	"""Completion percentage"""
+	"""Completion percentage (set for rendering jobs)"""
 	TimeTakenToRenderInMs: int
 	"""Time taken to render (set on completion)"""
+	EstimatedTimeRemainingInMs: int
+	"""Time remaining to render (set for rendering jobs)"""
 	Error: str
 	"""Error details (set on failure)"""
 
@@ -1202,6 +1204,68 @@ class TimelineSettings(TypedDict, total=False):
 	"""HDR Vivid master display"""
 	disableFusionToneMapping: str
 	"""'0' or '1'"""
+
+class DetectSceneCutsStatus(TypedDict, total=False):
+	JobStatus: str
+	"""'Inactive', 'Analyzing', 'Complete' or 'Cancelled'"""
+	CompletionPercentage: int
+	"""Completion percentage (set during analysis)"""
+	AnalysisSpeed: float
+	"""Analysis speed in fps (set during analysis)"""
+	EstimatedTimeRemaining: int
+	"""Estimated time remaining in seconds (set during analysis)"""
+
+class SlateAnalysisStatus(TypedDict, total=False):
+	JobStatus: str
+	"""'Inactive', 'Initializing', 'Analyzing', 'Cancelling', 'Cancelled', 'Complete' or 'Failed'"""
+	CompletionPercentage: int
+	"""Completion percentage (set during analysis)"""
+	CurrentClipIndex: int
+	"""Index of the clip being analyzed (set during analysis)"""
+	TotalClips: int
+	"""Total clips to analyze (set during analysis)"""
+	EstimatedTimeRemaining: int
+	"""Time remaining to complete analysis in seconds (set during analysis)"""
+	Error: str
+	"""Error details (set on failure)"""
+
+class TranscribeAudioStatus(TypedDict, total=False):
+	JobStatus: str
+	"""'Inactive', 'Initializing', 'Analyzing', 'Cancelling', 'Cancelled' or 'Complete'"""
+	CompletionPercentage: int
+	"""Completion percentage (set while transcription is in progress)"""
+	CurrentClipIndex: int
+	"""Index of the clip being analyzed (set while transcription is in progress)"""
+	TotalClips: int
+	"""Total clips to analyze (set while transcription is in progress)"""
+	EstimatedTimeRemaining: int
+	"""Time remaining to complete transcription in seconds (set while transcription is in progress)"""
+	Error: str
+	"""Error details (set on failure)"""
+
+class SmartReframeStatus(TypedDict, total=False):
+	JobStatus: str
+	"""'Inactive', 'Initializing', 'Analyzing', 'Cancelled', 'Complete' or 'Failed'"""
+	CompletionPercentage: int
+	"""Completion percentage (set during analysis)"""
+	AnalysisSpeed: float
+	"""Analysis Speed in fps (set during analysis)"""
+	EstimatedTimeRemaining: int
+	"""Time remaining to complete smart reframe in seconds (set during analysis)"""
+	Error: str
+	"""Error details (set on failure)"""
+
+class CreateSubtitlesFromAudioStatus(TypedDict, total=False):
+	JobStatus: str
+	"""'Inactive', 'Initializing', 'Analyzing', 'Cancelling', 'Cancelled', 'Complete' or 'Failed'"""
+	CompletionPercentage: int
+	"""Completion percentage (set during analysis)"""
+	AnalysisSpeed: float
+	"""Analysis speed (set during analysis)"""
+	EstimatedTimeRemaining: int
+	"""Time remaining to complete subtitle creation in seconds (set during analysis)"""
+	Error: str
+	"""Error details (set on failure)"""
 
 class Transcription(TypedDict, total=False):
 	language: str
@@ -1819,6 +1883,9 @@ class Project:
 	def RenderWithQuickExport(self, quickExportPresetName: str, presetInfo: QuickExportRenderSettings) -> QuickExportRenderStatus:
 		"""Renders current timeline with quick export preset"""
 		...
+	def GetRenderWithQuickExportStatus(self) -> QuickExportRenderStatus:
+		"""Returns progress information for active RenderWithQuickExport operation"""
+		...
 	def GetRenderFormats(self) -> dict:
 		"""Returns a dict (format -> file extension) of available render formats"""
 		...
@@ -1875,6 +1942,21 @@ class Project:
 		...
 	def GenerateSpeech(self, speechSettings: SpeechSettings) -> MediaPoolItem:
 		"""Generates speech for given speechSettings dict"""
+		...
+	def GetTranscribeAudioStatus(self) -> TranscribeAudioStatus:
+		"""Returns a dict with job status and completion percentage of the active TranscribeAudio operation"""
+		...
+	def GetAnalyzeForSlateStatus(self) -> SlateAnalysisStatus:
+		"""Returns a dict with job status and completion percentage of the active AnalyzeForSlate operation"""
+		...
+	def GetSmartReframeStatus(self) -> SmartReframeStatus:
+		"""Returns a dict with job status and completion percentage of the active SmartReframe operation"""
+		...
+	def GetDetectSceneCutsStatus(self) -> DetectSceneCutsStatus:
+		"""Returns a dict with job status and completion percentage of the active DetectSceneCuts operation"""
+		...
+	def GetCreateSubtitlesFromAudioStatus(self) -> CreateSubtitlesFromAudioStatus:
+		"""Returns a dict with job status and completion percentage of the active CreateSubtitlesFromAudio operation"""
 		...
 
 class MediaPool:
@@ -2716,8 +2798,9 @@ class Graph:
 	def ApplyArriCdlLut(self) -> bool:
 		"""Applies ARRI CDL and LUT."""
 		...
-	def ApplyGradeFromDRX(self, path: str, gradeMode: int) -> bool:
-		"""Loads a still from given file path and applies grade to graph with gradeMode (0=No keyframes, 1=Source Timecode aligned, 2=Start Frames aligned)"""
+	def ApplyGradeFromDRX(self, path: str, gradeMode: int, applyToAllLayers = False) -> bool:
+		"""Loads a still from given file path and applies grade to graph with gradeMode (0=No keyframes, 1=Source Timecode aligned, 2=Start Frames aligned). "
+               "If applyToAllLayers is True, the grade is applied to all node-stack layers instead of just the active layer."""
 		...
 	def ResetAllGrades(self) -> bool:
 		"""Resets all grades in the graph"""
