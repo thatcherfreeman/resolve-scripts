@@ -6,6 +6,7 @@ ClipColor = Literal['Orange', 'Apricot', 'Yellow', 'Lime', 'Olive', 'Green', 'Te
 FlagColor = Literal['Blue', 'Cyan', 'Green', 'Yellow', 'Red', 'Pink', 'Purple', 'Fuchsia', 'Rose', 'Lavender', 'Sky', 'Mint', 'Lemon', 'Sand', 'Cocoa', 'Cream']
 MarkerColor = Literal['Blue', 'Cyan', 'Green', 'Yellow', 'Red', 'Pink', 'Purple', 'Fuchsia', 'Rose', 'Lavender', 'Sky', 'Mint', 'Lemon', 'Sand', 'Cocoa', 'Cream']
 MarkType = Literal['video', 'audio', 'all']
+NodeColor = Literal['Orange', 'Apricot', 'Yellow', 'Lime', 'Olive', 'Green', 'Teal', 'Navy', 'Blue', 'Purple', 'Violet', 'Pink', 'Tan', 'Beige', 'Brown', 'Chocolate']
 TrackType = Literal['video', 'audio', 'subtitle']
 
 KeyframeMode: TypeAlias = float
@@ -14,6 +15,16 @@ CloudSettingKey: TypeAlias = float
 """One of the resolve.* constants: CLOUD_SETTING_PROJECT_NAME, CLOUD_SETTING_PROJECT_MEDIA_PATH, CLOUD_SETTING_IS_COLLAB, CLOUD_SETTING_SYNC_MODE, CLOUD_SETTING_IS_CAMERA_ACCESS"""
 CloudSyncMode: TypeAlias = float
 """One of the resolve.* constants: CLOUD_SYNC_NONE, CLOUD_SYNC_PROXY_ONLY, CLOUD_SYNC_PROXY_AND_ORIG"""
+PhotoExportFormat: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_FORMAT_JPEG, PHOTO_FORMAT_PNG, PHOTO_FORMAT_HEIC, PHOTO_FORMAT_TIFF"""
+PhotoAutoQuality: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_AUTO_QUALITY_LEAST, PHOTO_AUTO_QUALITY_LOW, PHOTO_AUTO_QUALITY_MEDIUM, PHOTO_AUTO_QUALITY_HIGH, PHOTO_AUTO_QUALITY_BEST"""
+PhotoTiffCompressionType: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_TIFF_COMPRESSION_NONE, PHOTO_TIFF_COMPRESSION_LZW, PHOTO_TIFF_COMPRESSION_ZIP"""
+PhotoScaleMode: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_SCALE_ORIGINAL, PHOTO_SCALE_DIMENSIONS, PHOTO_SCALE_SHORT_SIDE, PHOTO_SCALE_LONG_SIDE, PHOTO_SCALE_PERCENT, PHOTO_SCALE_MEGAPIXELS"""
+PhotoResolutionUnit: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_RESOLUTION_UNIT_PPI, PHOTO_RESOLUTION_UNIT_PPCM"""
 AudioSyncSettingKey: TypeAlias = float
 """One of the resolve.* constants: AUDIO_SYNC_MODE, AUDIO_SYNC_CHANNEL_NUMBER, AUDIO_SYNC_RETAIN_EMBEDDED_AUDIO, AUDIO_SYNC_RETAIN_VIDEO_METADATA"""
 AudioSyncMode: TypeAlias = float
@@ -43,9 +54,9 @@ TimelineExportType: TypeAlias = float
 TimelineExportSubtype: TypeAlias = float
 """One of the resolve.* constants: EXPORT_NONE, EXPORT_AAF_NEW, EXPORT_AAF_EXISTING, EXPORT_CDL, EXPORT_SDL, EXPORT_MISSING_CLIPS"""
 SubtitleSettingKey: TypeAlias = float
-"""One of the resolve.* constants: SUBTITLE_LANGUAGE, SUBTITLE_CAPTION_PRESET, SUBTITLE_CHARS_PER_LINE, SUBTITLE_LINE_BREAK, SUBTITLE_GAP"""
+"""One of the resolve.* constants: SUBTITLE_LANGUAGE, SUBTITLE_CAPTION_PRESET, SUBTITLE_CHARS_PER_LINE, SUBTITLE_LINE_BREAK, SUBTITLE_GAP, SUBTITLE_EXTENDED_LANGUAGE_SUPPORT"""
 AutoCaptionLanguage: TypeAlias = float
-"""One of the resolve.* constants: AUTO_CAPTION_AUTO, AUTO_CAPTION_MANDARIN_SIMPLIFIED, AUTO_CAPTION_DUTCH, AUTO_CAPTION_ENGLISH, AUTO_CAPTION_FINNISH, AUTO_CAPTION_FRENCH, AUTO_CAPTION_GERMAN, AUTO_CAPTION_HINDI, AUTO_CAPTION_INDONESIAN, AUTO_CAPTION_ITALIAN, AUTO_CAPTION_JAPANESE, AUTO_CAPTION_KOREAN, AUTO_CAPTION_MALAY, AUTO_CAPTION_NORWEGIAN, AUTO_CAPTION_POLISH, AUTO_CAPTION_PORTUGUESE, AUTO_CAPTION_ROMANIAN, AUTO_CAPTION_RUSSIAN, AUTO_CAPTION_SPANISH, AUTO_CAPTION_SWEDISH, AUTO_CAPTION_TURKISH, AUTO_CAPTION_VIETNAMESE, AUTO_CAPTION_TAMIL, AUTO_CAPTION_THAI, AUTO_CAPTION_DANISH, AUTO_CAPTION_MANDARIN_TRADITIONAL"""
+"""One of the resolve.* constants: AUTO_CAPTION_AUTO, AUTO_CAPTION_MANDARIN_SIMPLIFIED, AUTO_CAPTION_DUTCH, AUTO_CAPTION_ENGLISH, AUTO_CAPTION_FINNISH, AUTO_CAPTION_FRENCH, AUTO_CAPTION_GERMAN, AUTO_CAPTION_HINDI, AUTO_CAPTION_INDONESIAN, AUTO_CAPTION_ITALIAN, AUTO_CAPTION_JAPANESE, AUTO_CAPTION_KOREAN, AUTO_CAPTION_MALAY, AUTO_CAPTION_NORWEGIAN, AUTO_CAPTION_POLISH, AUTO_CAPTION_PORTUGUESE, AUTO_CAPTION_ROMANIAN, AUTO_CAPTION_RUSSIAN, AUTO_CAPTION_SPANISH, AUTO_CAPTION_SWEDISH, AUTO_CAPTION_TURKISH, AUTO_CAPTION_VIETNAMESE, AUTO_CAPTION_TAMIL, AUTO_CAPTION_THAI, AUTO_CAPTION_DANISH, AUTO_CAPTION_MANDARIN_TRADITIONAL, AUTO_CAPTION_AFRIKAANS, AUTO_CAPTION_ARABIC, AUTO_CAPTION_ARMENIAN, AUTO_CAPTION_AZERBAIJANI, AUTO_CAPTION_BELARUSIAN, AUTO_CAPTION_BOSNIAN, AUTO_CAPTION_BULGARIAN, AUTO_CAPTION_CANTONESE, AUTO_CAPTION_CATALAN, AUTO_CAPTION_CROATIAN, AUTO_CAPTION_CZECH, AUTO_CAPTION_ESTONIAN, AUTO_CAPTION_GALICIAN, AUTO_CAPTION_GREEK, AUTO_CAPTION_HEBREW, AUTO_CAPTION_HUNGARIAN, AUTO_CAPTION_ICELANDIC, AUTO_CAPTION_KANNADA, AUTO_CAPTION_KAZAKH, AUTO_CAPTION_LATVIAN, AUTO_CAPTION_LITHUANIAN, AUTO_CAPTION_MACEDONIAN, AUTO_CAPTION_MAORI, AUTO_CAPTION_MARATHI, AUTO_CAPTION_MYANMAR, AUTO_CAPTION_NEPALI, AUTO_CAPTION_PERSIAN, AUTO_CAPTION_SERBIAN, AUTO_CAPTION_SLOVAK, AUTO_CAPTION_SLOVENIAN, AUTO_CAPTION_SWAHILI, AUTO_CAPTION_TAGALOG, AUTO_CAPTION_UKRAINIAN, AUTO_CAPTION_URDU, AUTO_CAPTION_WELSH"""
 AutoCaptionPreset: TypeAlias = float
 """One of the resolve.* constants: AUTO_CAPTION_SUBTITLE_DEFAULT, AUTO_CAPTION_TELETEXT, AUTO_CAPTION_NETFLIX"""
 AutoCaptionLineBreak: TypeAlias = float
@@ -56,6 +67,8 @@ DynamicZoomEase: TypeAlias = float
 """One of the resolve.* constants: DYNAMIC_ZOOM_EASE_LINEAR, DYNAMIC_ZOOM_EASE_IN, DYNAMIC_ZOOM_EASE_OUT, DYNAMIC_ZOOM_EASE_IN_AND_OUT"""
 CompositeMode: TypeAlias = float
 """One of the resolve.* constants: COMPOSITE_NORMAL, COMPOSITE_ADD, COMPOSITE_SUBTRACT, COMPOSITE_DIFF, COMPOSITE_MULTIPLY, COMPOSITE_SCREEN, COMPOSITE_OVERLAY, COMPOSITE_HARDLIGHT, COMPOSITE_SOFTLIGHT, COMPOSITE_DARKEN, COMPOSITE_LIGHTEN, COMPOSITE_COLOR_DODGE, COMPOSITE_COLOR_BURN, COMPOSITE_EXCLUSION, COMPOSITE_HUE, COMPOSITE_SATURATE, COMPOSITE_COLORIZE, COMPOSITE_LUMA_MASK, COMPOSITE_DIVIDE, COMPOSITE_LINEAR_DODGE, COMPOSITE_LINEAR_BURN, COMPOSITE_LINEAR_LIGHT, COMPOSITE_VIVID_LIGHT, COMPOSITE_PIN_LIGHT, COMPOSITE_HARD_MIX, COMPOSITE_LIGHTER_COLOR, COMPOSITE_DARKER_COLOR, COMPOSITE_FOREGROUND, COMPOSITE_ALPHA, COMPOSITE_INVERTED_ALPHA, COMPOSITE_LUM, COMPOSITE_INVERTED_LUM"""
+KeyframeTiming: TypeAlias = float
+"""One of the resolve.* constants: KEYFRAME_TIMING_MAINTAIN, KEYFRAME_TIMING_STRETCH_TO_FIT"""
 RetimeProcess: TypeAlias = float
 """One of the resolve.* constants: RETIME_USE_PROJECT, RETIME_NEAREST, RETIME_FRAME_BLEND, RETIME_OPTICAL_FLOW"""
 MotionEstimation: TypeAlias = float
@@ -80,6 +93,12 @@ SmartSwitchAnalysisMode: TypeAlias = float
 """One of the resolve.* constants: SMART_SWITCH_ANALYSIS_MODE_NONE, SMART_SWITCH_ANALYSIS_MODE_DETECT_WIDE_ANGLE, SMART_SWITCH_ANALYSIS_MODE_AUDIO_ONLY"""
 CloneChecksumType: TypeAlias = float
 """One of the resolve.* constants: CLONE_CHECKSUM_TYPE_NONE, CLONE_CHECKSUM_TYPE_FILESIZE, CLONE_CHECKSUM_TYPE_CRC32, CLONE_CHECKSUM_TYPE_MD5, CLONE_CHECKSUM_TYPE_SHA256, CLONE_CHECKSUM_TYPE_SHA512, CLONE_CHECKSUM_TYPE_XXH_64"""
+PhotoImageOrientation: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_ORIENTATION_0_DEG, PHOTO_ORIENTATION_90_DEG_RIGHT, PHOTO_ORIENTATION_180_DEG, PHOTO_ORIENTATION_90_DEG_LEFT"""
+PhotoCropRatio: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_CROP_RATIO_AS_SHOT, PHOTO_CROP_RATIO_CUSTOM, PHOTO_CROP_RATIO_16X9, PHOTO_CROP_RATIO_1X1, PHOTO_CROP_RATIO_4X5, PHOTO_CROP_RATIO_2X3, PHOTO_CROP_RATIO_4X3"""
+PhotoLookType: TypeAlias = float
+"""One of the resolve.* constants: PHOTO_LOOK_DEFAULT, PHOTO_LOOK_BW, PHOTO_LOOK_BRIGHT, PHOTO_LOOK_COOL, PHOTO_LOOK_DRAMATIC, PHOTO_LOOK_GOLD, PHOTO_LOOK_NATURAL, PHOTO_LOOK_RICH_CONTRAST, PHOTO_LOOK_ROSE, PHOTO_LOOK_VIBRANT, PHOTO_LOOK_WARM"""
 
 class AAFImportOptions(TypedDict, total=False):
 	autoImportSourceClipsIntoMediaPool: bool
@@ -102,6 +121,7 @@ class AAFImportOptions(TypedDict, total=False):
 	"""Media Pool folders to search for source clips"""
 
 class AppendClipInfo(TypedDict, total=False):
+	"""Clip source and target mapping used by MediaPool.AppendToTimeline. Also see the similar CreateTimelineClipInfo."""
 	mediaPoolItem: 'MediaPoolItem'
 	"""MediaPoolItem object to append"""
 	startFrame: float
@@ -114,6 +134,12 @@ class AppendClipInfo(TypedDict, total=False):
 	"""Destination track index (optional)"""
 	recordFrame: float
 	"""Record frame position (optional)"""
+
+class AudioLevelsInfo(TypedDict, total=False):
+	TruePeak: float
+	"""True peak in dBFS, e.g. -4.5 (-100.0 if no level was measured)"""
+	Integrated: float
+	"""Integrated loudness in LUFS, e.g. -18.4 (-100.0 if no level was measured)"""
 
 class AudioSyncSettings(TypedDict, total=False):
 	syncMode: AudioSyncMode
@@ -133,7 +159,7 @@ class AutoAlignOptions(TypedDict, total=False):
 
 class AutoCaptionSettings(TypedDict, total=False):
 	language: AutoCaptionLanguage
-	"""Default: resolve.AUTO_CAPTION_AUTO"""
+	"""Default: resolve.AUTO_CAPTION_AUTO. Extended languages (e.g. Arabic, Czech) require extendedLanguageSupport"""
 	captionPreset: AutoCaptionPreset
 	"""Default: resolve.AUTO_CAPTION_SUBTITLE_DEFAULT"""
 	charsPerLine: int
@@ -142,6 +168,8 @@ class AutoCaptionSettings(TypedDict, total=False):
 	"""Default: resolve.AUTO_CAPTION_LINE_SINGLE"""
 	gap: int
 	"""Gap between subtitles in frames, 0 to 10 (default: 0)"""
+	extendedLanguageSupport: bool
+	"""Enable Extended Language Support, which allows more languages (default: False). Fails if the extended language models are not installed"""
 
 class CDL(TypedDict, total=False):
 	NodeIndex: int
@@ -241,7 +269,84 @@ class CompoundClipOptions(TypedDict, total=False):
 	name: str
 	"""Compound clip name"""
 
+class CopyAttributesOptions(TypedDict, total=False):
+	keyframeTiming: KeyframeTiming
+	"""Default: resolve.KEYFRAME_TIMING_MAINTAIN"""
+	allClipAttributes: bool
+	"""Copy all clip attributes (clipColor, flags, markers)"""
+	clipColor: bool
+	"""Copy clip color"""
+	flags: bool
+	"""Copy flags"""
+	markers: bool
+	"""Copy markers"""
+	allVideoAttributes: bool
+	"""Copy all video attributes (compositionMode, opacity, position, rotationAngle, anchorPoint, pitch, yaw, allZoomAttributes, allCropAttributes, allFlipAttributes, retimeProcess, motionEstimation, videoPlugins, colorCorrection, fusionEffects)"""
+	compositionMode: bool
+	"""Copy composition mode"""
+	opacity: bool
+	"""Copy opacity"""
+	position: bool
+	"""Copy position"""
+	rotationAngle: bool
+	"""Copy rotation angle"""
+	anchorPoint: bool
+	"""Copy anchor point"""
+	pitch: bool
+	"""Copy pitch"""
+	yaw: bool
+	"""Copy yaw"""
+	allZoomAttributes: bool
+	"""Copy all zoom attributes (scaleX, scaleY)"""
+	scaleX: bool
+	"""Copy scale X"""
+	scaleY: bool
+	"""Copy scale Y"""
+	allCropAttributes: bool
+	"""Copy all crop attributes (cropLeft, cropRight, cropTop, cropBottom, cropSoftness, retainImagePosition)"""
+	cropLeft: bool
+	"""Copy left crop"""
+	cropRight: bool
+	"""Copy right crop"""
+	cropTop: bool
+	"""Copy top crop"""
+	cropBottom: bool
+	"""Copy bottom crop"""
+	cropSoftness: bool
+	"""Copy crop softness"""
+	retainImagePosition: bool
+	"""Retain image position when copying crop"""
+	allFlipAttributes: bool
+	"""Copy all flip attributes (flipV, flipH)"""
+	flipV: bool
+	"""Copy vertical flip"""
+	flipH: bool
+	"""Copy horizontal flip"""
+	retimeProcess: bool
+	"""Copy retime process"""
+	motionEstimation: bool
+	"""Copy motion estimation"""
+	videoPlugins: bool
+	"""Copy video plugins/filters"""
+	colorCorrection: bool
+	"""Copy color correction/grade"""
+	fusionEffects: bool
+	"""Copy Fusion effects"""
+	allAudioAttributes: bool
+	"""Copy all Audio Attributes (audioVolume, audioPlugins, audioEqualizer)"""
+	audioVolume: bool
+	"""Copy audio volume"""
+	audioPlugins: bool
+	"""Copy audio plugins/filters"""
+	audioEqualizer: bool
+	"""Copy audio equalizer"""
+	retimeEffect: bool
+	"""Copy retime/speed timemap"""
+	rippleSequence: bool
+	"""Ripple sequence after pasting the timemap. Requires retimeEffect"""
+
 class CreateTimelineClipInfo(TypedDict, total=False):
+	"""Clip source mapping used by MediaPool.CreateTimelineFromClips. Also see the similar AppendClipInfo."""
 	mediaPoolItem: 'MediaPoolItem'
 	"""MediaPoolItem object to append"""
 	startFrame: float
@@ -278,6 +383,14 @@ class DeblurOptions(TypedDict, total=False):
 	"""Render at source resolution (default: False)"""
 	UseMoreGpuMemory: bool
 	"""Use more GPU memory for processing (default: False)"""
+
+class EffectInfo(TypedDict, total=False):
+	category: str
+	"""'fusion', 'ofx' or 'audio'"""
+	id: str
+	"""Unique identifier of the effect"""
+	name: str
+	"""Display name of the effect"""
 
 class EncryptDCTLOptions(TypedDict, total=False):
 	Name: str | None
@@ -388,6 +501,18 @@ class NormalizeAudioOptions(TypedDict, total=False):
 	setLevelMode: NormalizeAudioSetLevelMode
 	"""Default: resolve.NORMALIZE_AUDIO_SET_LEVEL_RELATIVE"""
 
+class RemoveSilenceOptions(TypedDict, total=False):
+	threshold: float
+	"""Silence threshold in dB (default: -25.0, range: -100.0 to 10.0)"""
+	preHead: int
+	"""Pre-head padding in frames (default: 0)"""
+	postTail: int
+	"""Post-tail padding in frames (default: 0)"""
+	minimumToStrip: int
+	"""Minimum silence duration in frames to strip (default: timeline's FPS)"""
+	crossFadeAudio: bool
+	"""Add cross-fades at edit points (default: False)"""
+
 class OutputBlanking(TypedDict, total=False):
 	Top: int
 	"""Top blanking in pixels"""
@@ -397,6 +522,118 @@ class OutputBlanking(TypedDict, total=False):
 	"""Left blanking in pixels"""
 	Right: int
 	"""Right blanking in pixels"""
+
+class PhotoQuickExportRenderSettings(TypedDict, total=False):
+	TargetDir: str
+	"""Output directory path (required)"""
+	CustomName: str
+	"""Output filename, supports tags (required)"""
+	BitDepth: int | None
+	"""Bit depth: 8 or 16 for PNG and TIFF, 8 or 10 for HEIC (HEIC on macOS only, default: 8)"""
+	ManualQualityPercent: int | None
+	"""Image quality in percent, 1 to 100 (JPEG and HEIC only, default: 80)"""
+	TiffCompressionType: PhotoTiffCompressionType | None
+	"""TIFF compression type, e.g. resolve.PHOTO_TIFF_COMPRESSION_LZW (TIFF only, default: resolve.PHOTO_TIFF_COMPRESSION_NONE)"""
+	CompressionLevel: int | None
+	"""Compression level, 0 to 9 (PNG, and TIFF when TiffCompressionType is ZIP, default: 0)"""
+	ScalePercent: int | None
+	"""Scale in percent: 100 (original), 75, 50 or 25 (JPEG, PNG and HEIC only, default: 100)"""
+	Resolution: int | None
+	"""Resolution in pixels per inch (ppi), 40 to 1200 (default: 72)"""
+	IncludeMetadata: bool | None
+	"""Embed metadata in the exported image (default: True)"""
+
+class PhotoRenderSettings(TypedDict, total=False):
+	TargetDir: str
+	"""Output directory path"""
+	CustomName: str
+	"""Output filename prefix, supports tags"""
+	UsePhotoAlbumName: bool
+	"""Use the photo album name as the filename prefix instead of CustomName"""
+	CustomSuffix: str
+	"""Output filename suffix, supports tags"""
+	FilenameDigits: int
+	"""Number of digits in the filename frame number, 1 to 10"""
+	Format: PhotoExportFormat
+	"""Image format, e.g. resolve.PHOTO_FORMAT_JPEG"""
+	BitDepth: int
+	"""Bit depth: 8 or 16 for PNG and TIFF, 8 or 10 for HEIC (HEIC on macOS only)"""
+	ExportAlpha: bool
+	"""Enable alpha channel export (PNG and TIFF only)"""
+	AutoQualityLevel: PhotoAutoQuality
+	"""Use automatic quality at the given level, e.g. resolve.PHOTO_AUTO_QUALITY_BEST (JPEG only, cannot be combined with ManualQualityPercent)"""
+	ManualQualityPercent: int
+	"""Use manual quality at the given percent: JPEG 1 to 100, HEIC 0 to 100 (JPEG and HEIC only, cannot be combined with AutoQualityLevel)"""
+	TiffCompressionType: PhotoTiffCompressionType
+	"""TIFF compression type, e.g. resolve.PHOTO_TIFF_COMPRESSION_LZW (TIFF only)"""
+	CompressionLevel: int
+	"""Compression level, 0 to 9 (PNG, and TIFF when TiffCompressionType is ZIP)"""
+	ScaleMode: PhotoScaleMode
+	"""Scaling mode, e.g. resolve.PHOTO_SCALE_PERCENT. Changing it requires the value field of the new mode"""
+	ScaleWidth: int
+	"""Output width in pixels (requires ScaleMode resolve.PHOTO_SCALE_DIMENSIONS)"""
+	ScaleHeight: int
+	"""Output height in pixels (requires ScaleMode resolve.PHOTO_SCALE_DIMENSIONS)"""
+	ScaleShortSide: int
+	"""Short side length in pixels (requires ScaleMode resolve.PHOTO_SCALE_SHORT_SIDE)"""
+	ScaleLongSide: int
+	"""Long side length in pixels (requires ScaleMode resolve.PHOTO_SCALE_LONG_SIDE)"""
+	ScalePercent: int
+	"""Scale in percent, 25 to 100 (requires ScaleMode resolve.PHOTO_SCALE_PERCENT)"""
+	ScaleMegapixels: float
+	"""Output size in megapixels, one decimal place, e.g. 12.5 (requires ScaleMode resolve.PHOTO_SCALE_MEGAPIXELS)"""
+	AllowEnlarge: bool
+	"""Allow scaling above the original size (not used with resolve.PHOTO_SCALE_ORIGINAL or resolve.PHOTO_SCALE_PERCENT)"""
+	Resolution: int
+	"""Resolution value in the unit given by ResolutionUnit, 40 to 3000"""
+	ResolutionUnit: PhotoResolutionUnit
+	"""Resolution unit, e.g. resolve.PHOTO_RESOLUTION_UNIT_PPI"""
+	IncludeMetadata: bool
+	"""Embed metadata in the exported image"""
+
+class PhotoAlbumItemProperties(TypedDict, total=False):
+	SourceTransformEnabled: bool
+	"""Enable/disable Source Transform filter section"""
+	Pan: float
+	"""Horizontal position in pixels, -4.0*width to 4.0*width"""
+	Tilt: float
+	"""Vertical position in pixels, -4.0*height to 4.0*height"""
+	ZoomX: float
+	"""Horizontal zoom factor, 0.01 to 100.0 (1.0 = no zoom)"""
+	ZoomY: float
+	"""Vertical zoom factor, 0.01 to 100.0 (1.0 = no zoom)"""
+	ZoomGang: bool
+	"""Link ZoomX and ZoomY so both change together"""
+	RotationAngle: float
+	"""Rotation in degrees, -360.0 to 360.0"""
+	Pitch: float
+	"""3D rotation around the horizontal axis, -1.5 to 1.5"""
+	Yaw: float
+	"""3D rotation around the vertical axis, -1.5 to 1.5"""
+	FlipX: bool
+	"""Flip image horizontally"""
+	FlipY: bool
+	"""Flip image vertically"""
+	ImageOrientation: PhotoImageOrientation
+	"""Image orientation, e.g. resolve.PHOTO_ORIENTATION_90_DEG_RIGHT"""
+	SourceCroppingEnabled: bool
+	"""Enable/disable Source Cropping filter section"""
+	CropLeft: float
+	"""Pixels cropped from the left edge, 0.0 to width"""
+	CropRight: float
+	"""Pixels cropped from the right edge, 0.0 to width"""
+	CropTop: float
+	"""Pixels cropped from the top edge, 0.0 to height"""
+	CropBottom: float
+	"""Pixels cropped from the bottom edge, 0.0 to height"""
+	CropRatio: PhotoCropRatio
+	"""Crop aspect ratio preset, e.g. resolve.PHOTO_CROP_RATIO_16X9"""
+	CropLockAspectRatio: bool
+	"""Locks the crop aspect ratio"""
+	SourceLooksEnabled: bool
+	"""Enable/disable Source Looks filter section"""
+	SourceLookType: PhotoLookType
+	"""Look preset, e.g. resolve.PHOTO_LOOK_WARM"""
 
 class ProjectAttributes(TypedDict, total=False):
 	lastModifiedDate: str
@@ -716,7 +953,9 @@ class ProjectSettings(TypedDict, total=False):
 	superScaleNoiseReductionStrength: str
 	"""Read-only. Noise reduction strength, e.g. '0.5'"""
 	transcriptionLanguage: str
-	"""Language code, e.g. 'en'"""
+	"""Language code, e.g. 'en'. Must be a language of the model selected by transcriptionExtendedLanguageSupport"""
+	transcriptionExtendedLanguageSupport: str
+	"""'0' or '1'. Changing it resets transcriptionLanguage to 'auto', as in the UI. Setting '1' fails if the extended language models are not installed"""
 	speakerDetection: str
 	"""'0' or '1'"""
 	nodeStackLayers: str
@@ -756,65 +995,109 @@ class QuickExportRenderStatus(TypedDict, total=False):
 	Error: str
 	"""Error details (set on failure)"""
 
+class ExportFrameOptions(TypedDict, total=False):
+	outputType: str | None
+	"""'file' or 'encodedString' (default: 'encodedString')"""
+	encodedImageFormat: str | None
+	"""'jpg' or 'png', used when outputType is 'encodedString' (default: 'jpg')"""
+	filePath: str | None
+	"""Output file path, format inferred from extension (required when outputType is 'file')"""
+	maxDimension: int | None
+	"""Caps the longer edge in pixels, scaling the other edge proportionally (default: 0, no scaling)"""
+
+class ExportFrameResult(TypedDict, total=False):
+	success: bool
+	"""True if the frame was exported successfully"""
+	error: str | None
+	"""Error message (set on failure)"""
+	data: str | None
+	"""Base64-encoded image bytes (set when outputType is 'encodedString' and success is True)"""
+
 class RenderJobInfo(TypedDict, total=False):
 	JobId: str
 	"""Unique job identifier"""
 	RenderJobName: str
 	"""Job display name"""
-	TimelineName: str
+	TimelineName: str | None
 	"""Source timeline name"""
 	TargetDir: str
 	"""Output directory path"""
-	IsExportVideo: bool
+	IsExportVideo: bool | None
 	"""Video export enabled"""
-	IsExportAudio: bool
+	IsExportAudio: bool | None
 	"""Audio export enabled"""
-	FormatWidth: int
+	FormatWidth: int | None
 	"""Output width in pixels"""
-	FormatHeight: int
+	FormatHeight: int | None
 	"""Output height in pixels"""
-	FrameRate: str
+	FrameRate: str | None
 	"""Frame rate, e.g. '23.976'"""
-	PixelAspectRatio: float
+	PixelAspectRatio: float | None
 	"""Pixel aspect ratio"""
-	MarkIn: int
+	MarkIn: int | None
 	"""Mark in frame"""
-	MarkOut: int
+	MarkOut: int | None
 	"""Mark out frame"""
-	AudioBitDepth: int
+	AudioBitDepth: int | None
 	"""Audio bit depth, e.g. 16, 24"""
-	AudioSampleRate: int
+	AudioSampleRate: int | None
 	"""Audio sample rate, e.g. 48000"""
 	ExportAlpha: bool
 	"""Alpha channel export enabled"""
-	AlphaMode: int
+	AlphaMode: int | None
 	"""0 = Premultiplied, 1 = Straight (set when ExportAlpha is True)"""
 	OutputFilename: str
 	"""Output file name(s)"""
-	RenderMode: str
+	RenderMode: str | None
 	"""'Single clip' or 'Individual clips'"""
 	PresetName: str
 	"""Render preset name"""
-	VideoFormat: str
+	VideoFormat: str | None
 	"""Video format name, e.g. 'QuickTime'"""
-	VideoCodec: str
+	VideoCodec: str | None
 	"""Video codec name"""
-	AudioCodec: str
+	AudioCodec: str | None
 	"""Audio codec name"""
-	EncodingProfile: str
+	EncodingProfile: str | None
 	"""Encoding profile, e.g. 'Main10'"""
-	MultiPassEncode: bool
+	MultiPassEncode: bool | None
 	"""Multi-pass encoding enabled"""
-	NetworkOptimization: bool
+	NetworkOptimization: bool | None
 	"""Network optimization enabled"""
-	UploadStatus: str
-	"""Upload status (if applicable)"""
-	ClipStartFrame: int
+	UploadStatus: str | None
+	"""Upload status, if applicable"""
+	ClipStartFrame: int | None
 	"""Clip start frame number"""
-	TimelineStartTimecode: str
+	TimelineStartTimecode: str | None
 	"""Timeline start timecode, e.g. '01:00:00:00'"""
-	ReplaceExistingFilesInPlace: bool
-	"""Replace existing files in place"""
+	ReplaceExistingFilesInPlace: bool | None
+	"""Replace existing files when rendering"""
+	PhotoAlbumName: str | None
+	"""Source photo album name"""
+	PhotoCount: int | None
+	"""Number of photos"""
+	PhotoFormat: str | None
+	"""Photo image format name, e.g. 'JPEG'"""
+	PhotoScaleMode: PhotoScaleMode | None
+	"""Photo scaling mode"""
+	PhotoScaleWidth: int | None
+	"""Photo width in pixels when PhotoScaleMode is PHOTO_SCALE_DIMENSIONS"""
+	PhotoScaleHeight: int | None
+	"""Photo height in pixels when PhotoScaleMode is PHOTO_SCALE_DIMENSIONS"""
+	PhotoScaleShortSide: int | None
+	"""Photo short side in pixels when PhotoScaleMode is PHOTO_SCALE_SHORT_SIDE"""
+	PhotoScaleLongSide: int | None
+	"""Photo long side in pixels when PhotoScaleMode is PHOTO_SCALE_LONG_SIDE"""
+	PhotoScalePercent: int | None
+	"""Photo scale in percent when PhotoScaleMode is PHOTO_SCALE_PERCENT"""
+	PhotoScaleMegapixels: float | None
+	"""Photo size in megapixels when PhotoScaleMode is PHOTO_SCALE_MEGAPIXELS"""
+	PhotoAllowEnlarge: bool | None
+	"""Photo scaling above original allowed"""
+	PhotoResolution: int | None
+	"""Photo resolution value"""
+	PhotoResolutionUnit: PhotoResolutionUnit | None
+	"""Photo resolution unit"""
 
 class RenderJobStatus(TypedDict, total=False):
 	JobStatus: str
@@ -1064,6 +1347,22 @@ class TimelineItemProperties(TypedDict, total=False):
 	"""Enable background reduction [Active Timeline Only]"""
 	AudioDialogueLevelerOutputGain: float
 	"""0.0 to 6.0 (dB) [Active Timeline Only]"""
+	TransitionType: str
+	"""Transition type name, e.g. 'Cross Dissolve' [Read Only]"""
+	TransitionCategory: str
+	"""'simple', 'fusion', 'ofx' or 'audio' [Read Only]"""
+	TransitionDuration: int
+	"""Transition duration in frames"""
+	TransitionAlignment: str
+	"""'left', 'center' or 'right'"""
+
+class TimelineItemPosition(TypedDict, total=False):
+	trackType: str
+	"""Type: 'video', 'audio', or 'subtitle' (returned by GetPosition; ignored by SetPosition and MoveItems)"""
+	trackIndex: int
+	"""1-based; omit to retain current track"""
+	startFrame: float
+	"""Frame number; omit to retain current frame"""
 
 class TimelineSettings(TypedDict, total=False):
 	useCustomSettings: str
@@ -1330,6 +1629,26 @@ class Resolve:
 	CLOUD_SYNC_NONE: CloudSyncMode
 	CLOUD_SYNC_PROXY_ONLY: CloudSyncMode
 	CLOUD_SYNC_PROXY_AND_ORIG: CloudSyncMode
+	PHOTO_FORMAT_JPEG: PhotoExportFormat
+	PHOTO_FORMAT_PNG: PhotoExportFormat
+	PHOTO_FORMAT_HEIC: PhotoExportFormat
+	PHOTO_FORMAT_TIFF: PhotoExportFormat
+	PHOTO_AUTO_QUALITY_LEAST: PhotoAutoQuality
+	PHOTO_AUTO_QUALITY_LOW: PhotoAutoQuality
+	PHOTO_AUTO_QUALITY_MEDIUM: PhotoAutoQuality
+	PHOTO_AUTO_QUALITY_HIGH: PhotoAutoQuality
+	PHOTO_AUTO_QUALITY_BEST: PhotoAutoQuality
+	PHOTO_TIFF_COMPRESSION_NONE: PhotoTiffCompressionType
+	PHOTO_TIFF_COMPRESSION_LZW: PhotoTiffCompressionType
+	PHOTO_TIFF_COMPRESSION_ZIP: PhotoTiffCompressionType
+	PHOTO_SCALE_ORIGINAL: PhotoScaleMode
+	PHOTO_SCALE_DIMENSIONS: PhotoScaleMode
+	PHOTO_SCALE_SHORT_SIDE: PhotoScaleMode
+	PHOTO_SCALE_LONG_SIDE: PhotoScaleMode
+	PHOTO_SCALE_PERCENT: PhotoScaleMode
+	PHOTO_SCALE_MEGAPIXELS: PhotoScaleMode
+	PHOTO_RESOLUTION_UNIT_PPI: PhotoResolutionUnit
+	PHOTO_RESOLUTION_UNIT_PPCM: PhotoResolutionUnit
 	AUDIO_SYNC_MODE: AudioSyncSettingKey
 	AUDIO_SYNC_CHANNEL_NUMBER: AudioSyncSettingKey
 	AUDIO_SYNC_RETAIN_EMBEDDED_AUDIO: AudioSyncSettingKey
@@ -1424,6 +1743,7 @@ class Resolve:
 	SUBTITLE_CHARS_PER_LINE: SubtitleSettingKey
 	SUBTITLE_LINE_BREAK: SubtitleSettingKey
 	SUBTITLE_GAP: SubtitleSettingKey
+	SUBTITLE_EXTENDED_LANGUAGE_SUPPORT: SubtitleSettingKey
 	AUTO_CAPTION_AUTO: AutoCaptionLanguage
 	AUTO_CAPTION_MANDARIN_SIMPLIFIED: AutoCaptionLanguage
 	AUTO_CAPTION_DUTCH: AutoCaptionLanguage
@@ -1450,6 +1770,41 @@ class Resolve:
 	AUTO_CAPTION_THAI: AutoCaptionLanguage
 	AUTO_CAPTION_DANISH: AutoCaptionLanguage
 	AUTO_CAPTION_MANDARIN_TRADITIONAL: AutoCaptionLanguage
+	AUTO_CAPTION_AFRIKAANS: AutoCaptionLanguage
+	AUTO_CAPTION_ARABIC: AutoCaptionLanguage
+	AUTO_CAPTION_ARMENIAN: AutoCaptionLanguage
+	AUTO_CAPTION_AZERBAIJANI: AutoCaptionLanguage
+	AUTO_CAPTION_BELARUSIAN: AutoCaptionLanguage
+	AUTO_CAPTION_BOSNIAN: AutoCaptionLanguage
+	AUTO_CAPTION_BULGARIAN: AutoCaptionLanguage
+	AUTO_CAPTION_CANTONESE: AutoCaptionLanguage
+	AUTO_CAPTION_CATALAN: AutoCaptionLanguage
+	AUTO_CAPTION_CROATIAN: AutoCaptionLanguage
+	AUTO_CAPTION_CZECH: AutoCaptionLanguage
+	AUTO_CAPTION_ESTONIAN: AutoCaptionLanguage
+	AUTO_CAPTION_GALICIAN: AutoCaptionLanguage
+	AUTO_CAPTION_GREEK: AutoCaptionLanguage
+	AUTO_CAPTION_HEBREW: AutoCaptionLanguage
+	AUTO_CAPTION_HUNGARIAN: AutoCaptionLanguage
+	AUTO_CAPTION_ICELANDIC: AutoCaptionLanguage
+	AUTO_CAPTION_KANNADA: AutoCaptionLanguage
+	AUTO_CAPTION_KAZAKH: AutoCaptionLanguage
+	AUTO_CAPTION_LATVIAN: AutoCaptionLanguage
+	AUTO_CAPTION_LITHUANIAN: AutoCaptionLanguage
+	AUTO_CAPTION_MACEDONIAN: AutoCaptionLanguage
+	AUTO_CAPTION_MAORI: AutoCaptionLanguage
+	AUTO_CAPTION_MARATHI: AutoCaptionLanguage
+	AUTO_CAPTION_MYANMAR: AutoCaptionLanguage
+	AUTO_CAPTION_NEPALI: AutoCaptionLanguage
+	AUTO_CAPTION_PERSIAN: AutoCaptionLanguage
+	AUTO_CAPTION_SERBIAN: AutoCaptionLanguage
+	AUTO_CAPTION_SLOVAK: AutoCaptionLanguage
+	AUTO_CAPTION_SLOVENIAN: AutoCaptionLanguage
+	AUTO_CAPTION_SWAHILI: AutoCaptionLanguage
+	AUTO_CAPTION_TAGALOG: AutoCaptionLanguage
+	AUTO_CAPTION_UKRAINIAN: AutoCaptionLanguage
+	AUTO_CAPTION_URDU: AutoCaptionLanguage
+	AUTO_CAPTION_WELSH: AutoCaptionLanguage
 	AUTO_CAPTION_SUBTITLE_DEFAULT: AutoCaptionPreset
 	AUTO_CAPTION_TELETEXT: AutoCaptionPreset
 	AUTO_CAPTION_NETFLIX: AutoCaptionPreset
@@ -1492,6 +1847,8 @@ class Resolve:
 	COMPOSITE_INVERTED_ALPHA: CompositeMode
 	COMPOSITE_LUM: CompositeMode
 	COMPOSITE_INVERTED_LUM: CompositeMode
+	KEYFRAME_TIMING_MAINTAIN: KeyframeTiming
+	KEYFRAME_TIMING_STRETCH_TO_FIT: KeyframeTiming
 	RETIME_USE_PROJECT: RetimeProcess
 	RETIME_NEAREST: RetimeProcess
 	RETIME_FRAME_BLEND: RetimeProcess
@@ -1553,6 +1910,28 @@ class Resolve:
 	CLONE_CHECKSUM_TYPE_SHA256: CloneChecksumType
 	CLONE_CHECKSUM_TYPE_SHA512: CloneChecksumType
 	CLONE_CHECKSUM_TYPE_XXH_64: CloneChecksumType
+	PHOTO_ORIENTATION_0_DEG: PhotoImageOrientation
+	PHOTO_ORIENTATION_90_DEG_RIGHT: PhotoImageOrientation
+	PHOTO_ORIENTATION_180_DEG: PhotoImageOrientation
+	PHOTO_ORIENTATION_90_DEG_LEFT: PhotoImageOrientation
+	PHOTO_CROP_RATIO_AS_SHOT: PhotoCropRatio
+	PHOTO_CROP_RATIO_CUSTOM: PhotoCropRatio
+	PHOTO_CROP_RATIO_16X9: PhotoCropRatio
+	PHOTO_CROP_RATIO_1X1: PhotoCropRatio
+	PHOTO_CROP_RATIO_4X5: PhotoCropRatio
+	PHOTO_CROP_RATIO_2X3: PhotoCropRatio
+	PHOTO_CROP_RATIO_4X3: PhotoCropRatio
+	PHOTO_LOOK_DEFAULT: PhotoLookType
+	PHOTO_LOOK_BW: PhotoLookType
+	PHOTO_LOOK_BRIGHT: PhotoLookType
+	PHOTO_LOOK_COOL: PhotoLookType
+	PHOTO_LOOK_DRAMATIC: PhotoLookType
+	PHOTO_LOOK_GOLD: PhotoLookType
+	PHOTO_LOOK_NATURAL: PhotoLookType
+	PHOTO_LOOK_RICH_CONTRAST: PhotoLookType
+	PHOTO_LOOK_ROSE: PhotoLookType
+	PHOTO_LOOK_VIBRANT: PhotoLookType
+	PHOTO_LOOK_WARM: PhotoLookType
 	def GetProjectManager(self) -> ProjectManager:
 		"""Returns the project manager object for currently open database"""
 		...
@@ -1597,6 +1976,9 @@ class Resolve:
 		...
 	def GetLayoutPresetList(self) -> list[str]:
 		"""Returns a list of available UI layout preset names"""
+		...
+	def GetEffectsList(self, mediaType: str | None = None) -> list[EffectInfo]:
+		"""Returns all available effects that can be applied to a timeline item. Optional argument mediaType: \"video\" (default), \"photo\" or \"audio\" restricts the list to effects applicable to that media type."""
 		...
 	def LoadLayoutPreset(self, presetName: str) -> bool:
 		"""Loads UI layout from saved preset"""
@@ -1655,8 +2037,8 @@ class Resolve:
 	def ExportKeyboardPreset(self, presetName: str, exportPath: str) -> bool:
 		"""Exports the named keyboard preset to the specified file path"""
 		...
-	def GetKeyframeMode(self) -> int:
-		"""Returns the currently set keyframe mode, one of the resolve.KEYFRAME_MODE_* constants. Color Page only."""
+	def GetKeyframeMode(self) -> KeyframeMode:
+		"""Returns the currently set keyframe mode, one of the resolve.KEYFRAME_MODE_* constants."""
 		...
 	def SetKeyframeMode(self, keyframeMode: KeyframeMode) -> bool:
 		"""Set keyframe mode"""
@@ -1793,6 +2175,18 @@ class Project:
 	def GetTimelineByIndex(self, idx: int) -> Timeline | None:
 		"""Returns timeline at the given index, 1 <= idx <= project.GetTimelineCount()"""
 		...
+	def GetPhotoAlbumCount(self) -> int:
+		"""Returns the number of photo albums in the project"""
+		...
+	def GetPhotoAlbumByIndex(self, idx: int) -> PhotoAlbum | None:
+		"""Returns photo album at the given index, 1 <= idx <= project.GetPhotoAlbumCount()"""
+		...
+	def GetCurrentPhotoAlbum(self) -> PhotoAlbum | None:
+		"""Returns the currently loaded photo album"""
+		...
+	def SetCurrentPhotoAlbum(self, photoAlbum: PhotoAlbum) -> bool:
+		"""Sets given photo album as current photo album for the project"""
+		...
 	def GetGallery(self) -> Gallery:
 		"""Returns the Gallery object"""
 		...
@@ -1886,6 +2280,15 @@ class Project:
 	def GetRenderWithQuickExportStatus(self) -> QuickExportRenderStatus:
 		"""Returns progress information for active RenderWithQuickExport operation"""
 		...
+	def GetPhotoQuickExportRenderPresets(self) -> list[str]:
+		"""Returns a list of quick export render presets for photo albums"""
+		...
+	def SetPhotoRenderSettings(self, settings: PhotoRenderSettings) -> bool:
+		"""Sets given settings for rendering the current photo album, settings not given keep their current value"""
+		...
+	def RenderPhotosWithQuickExport(self, quickExportPresetName: str, presetInfo: PhotoQuickExportRenderSettings) -> QuickExportRenderStatus:
+		"""Renders current photo album with quick export preset"""
+		...
 	def GetRenderFormats(self) -> dict:
 		"""Returns a dict (format -> file extension) of available render formats"""
 		...
@@ -1940,8 +2343,8 @@ class Project:
 	def ResetIntellisearchAnalysis(self) -> bool:
 		"""Resets intellisearch analysis for the project"""
 		...
-	def GenerateSpeech(self, speechSettings: SpeechSettings) -> MediaPoolItem:
-		"""Generates speech for given speechSettings dict"""
+	def GenerateSpeech(self, speechSettings: SpeechSettings, timecode: str | None = None) -> MediaPoolItem | None:
+		"""Generates speech for given speechSettings dict. Requires the 'AI Speech Generator' Extra to be installed; without it the call fails instead of returning a MediaPoolItem. Generates into the current project and timeline as of the call, not into the project this was called on. timecode sets where the audio lands and is only used when speechSettings has 'AddToTimeline' set. See README.md section 'Studio and AI Scripting APIs'."""
 		...
 	def GetTranscribeAudioStatus(self) -> TranscribeAudioStatus:
 		"""Returns a dict with job status and completion percentage of the active TranscribeAudio operation"""
@@ -1961,8 +2364,8 @@ class Project:
 
 class MediaPool:
 	"""The media pool of a project: its folders, its clips and the timelines created from them."""
-	def AddSubFolder(self, folder: Folder, name: str) -> Folder:
-		"""Adds new subfolder under specified Folder object with the given name"""
+	def AddSubFolder(self, folder: Folder, name: str) -> Folder | None:
+		"""Adds new subfolder under specified Folder object with the given name. A name already used by another subfolder is accepted and adds a second subfolder with that name, so check GetSubFolderList() first when the call is meant to be idempotent"""
 		...
 	def GetCurrentFolder(self) -> Folder:
 		"""Returns currently selected Folder"""
@@ -1982,14 +2385,26 @@ class MediaPool:
 	def AppendToTimeline(self, clipInfos: list[AppendClipInfo]) -> list[TimelineItem]:
 		"""Appends specified MediaPoolItem objects in the current timeline. Returns the list of appended timelineItems"""
 		...
-	def CreateEmptyTimeline(self, name: str) -> Timeline:
-		"""Adds new timeline with given name"""
+	def CreateEmptyTimeline(self, name: str, timecode: str | None = None) -> Timeline | None:
+		"""Adds new timeline with given name. Returns None if the timeline could not be created, which includes the name being empty, already used by another timeline, or containing characters that are not valid in a timeline name. Delete or rename the existing timeline before reusing its name"""
 		...
 	def ImportTimelineFromFile(self, filePath: str, importOptions: ImportOptions | None = None) -> Timeline:
 		"""Creates timeline based on parameters within given file (AAF/EDL/XML/FCPXML/DRT/ADL/OTIO) and optional importOptions dict"""
 		...
 	def DeleteTimelines(self, timelines: list[Timeline]) -> bool:
 		"""Deletes specified timelines in the media pool"""
+		...
+	def CreateEmptyPhotoAlbum(self, name: str) -> PhotoAlbum:
+		"""Adds new photo album with given name"""
+		...
+	def CreatePhotoAlbumFromPhotos(self, name: str, photos: list[MediaPoolItem]) -> PhotoAlbum:
+		"""Creates new photo album with specified name, and adds the specified still image MediaPoolItem objects"""
+		...
+	def DeletePhotoAlbums(self, photoAlbums: list[PhotoAlbum]) -> bool:
+		"""Deletes specified photo albums in the media pool"""
+		...
+	def AddToPhotoAlbum(self, photos: list[MediaPoolItem]) -> list[PhotoAlbumItem]:
+		"""Adds specified still image MediaPoolItem objects to the current photo album. Returns the list of added photoAlbumItems"""
 		...
 	def ExportMetadata(self, fileName: str, clips: list[MediaPoolItem] | None = None) -> bool:
 		"""Exports metadata of specified clips to 'fileName' in CSV format. If no clips are specified, all clips from media pool will be used"""
@@ -2057,6 +2472,12 @@ class MediaPoolItem:
 	def GetTimeline(self) -> Timeline:
 		"""Returns the timeline object if the mpItem is a timeline clip"""
 		...
+	def GetPhotoAlbum(self) -> PhotoAlbum | None:
+		"""Returns the photo album object if the mpItem is a photo album clip"""
+		...
+	def GetParentFolder(self) -> Folder:
+		"""Returns the Folder object containing this media pool item."""
+		...
 	def GetMetadata(self, metadataType: str | None = None) -> str | dict:
 		"""Returns the metadata value for the key 'metadataType'. If no argument is specified, a dict of all set metadata properties is returned."""
 		...
@@ -2077,6 +2498,9 @@ class MediaPoolItem:
 		...
 	def DeleteMarkersByColor(self, color: MarkerColor | Literal['All']) -> bool:
 		"""Delete all markers of the specified color. 'All' as argument deletes all color markers."""
+		...
+	def ExportFrame(self, frameOffset: int, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
+		"""Exports the frame at frameOffset (0-based offset from the item start) as a still image per exportFrameOptions."""
 		...
 	def DeleteMarkerAtFrame(self, frameNum: int) -> bool:
 		"""Delete marker at frame number from the media pool item."""
@@ -2175,10 +2599,13 @@ class MediaPoolItem:
 		"""Perform Intellisearch analysis on the MediaPoolItem."""
 		...
 	def AnalyzeForSlate(self, markerColor: SlateMarkerColor) -> bool:
-		"""Perform Slate analysis on the MediaPoolItem."""
+		"""Perform Slate analysis on the MediaPoolItem, adding a 'Detected Slate' duration marker in markerColor over the frames of each slate found. The text written on the slate is not read: use GetMarkers() to locate the slate, the marker carries no transcription of its contents. See README.md section 'Analyze Slate Settings'."""
 		...
 	def GetTranscription(self, useNestedClipTranscription = False) -> Transcription:
 		"""Returns transcription data for the media pool item if available."""
+		...
+	def SetTranscription(self, transcription: Transcription) -> bool:
+		"""Replaces the transcription of the MediaPoolItem. Timelines are transcribed as a nested clip. See README.md section 'Setting a Transcription'."""
 		...
 
 class Timeline:
@@ -2188,6 +2615,12 @@ class Timeline:
 		...
 	def SetName(self, timelineName: str) -> bool:
 		"""Sets the timeline name if timelineName (string) is unique."""
+		...
+	def GetIsEnabled(self) -> bool:
+		"""Returns True if the timeline is enabled."""
+		...
+	def SetIsEnabled(self, enabled: bool) -> bool:
+		"""Enables/disables the timeline and returns True if successful."""
 		...
 	def GetStartFrame(self) -> int:
 		"""Returns the frame number at the start of timeline."""
@@ -2240,6 +2673,9 @@ class Timeline:
 	def GetCurrentClipThumbnailImage(self) -> ThumbnailData:
 		"""Returns a dict with data containing raw thumbnail image data for current media in the Color Page."""
 		...
+	def ExportFrame(self, frameOffset: int, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
+		"""Exports the frame at frameOffset (0-based offset from the timeline start) as a still image per exportFrameOptions."""
+		...
 	def AddTrack(self, trackType: TrackType, subTrackType: str | None = None) -> bool:
 		"""Adds track of TrackType. Optional argument subTrackType."""
 		...
@@ -2264,8 +2700,14 @@ class Timeline:
 	def DeleteClips(self, timelineItems: list[TimelineItem], rippleDelete = False) -> bool:
 		"""Deletes specified TimelineItems from the timeline, performing ripple delete if second argument is True."""
 		...
+	def DeleteGaps(self) -> bool:
+		"""Deletes all gaps between clips on the timeline, rippling content to close the gaps."""
+		...
 	def SetClipsLinked(self, timelineItems: list[TimelineItem], linked: bool) -> bool:
 		"""Links or unlinks the specified TimelineItems depending on second argument."""
+		...
+	def MoveItems(self, timelineItems: list[TimelineItem], position: TimelineItemPosition, moveLinkedItems = True, subframePrecision = False) -> bool:
+		"""Moves the leftmost TimelineItem (lowest track on ties) to the given position and the other items relative to it. Fails if any item cannot reach its destination. If subframePrecision is True, fractional startFrame values are allowed for audio clips when the 'Align audio edits to frame boundaries' preference is off. Otherwise, the position is aligned to whole frames."""
 		...
 	def NormalizeAudioLevel(self, timelineItems: list[TimelineItem], normalizeAudioOptions: NormalizeAudioOptions | None = None) -> bool:
 		"""Normalizes the audio level of specified TimelineItems using the given normalizeAudioOptions."""
@@ -2417,6 +2859,12 @@ class TimelineItem:
 	def GetRightOffset(self, subframePrecision = False) -> float:
 		"""Returns the maximum extension by frame for clip from right side. Returns fractional frames if subframe_precision is True"""
 		...
+	def SetLeftOffset(self, offset: float, subframePrecision = False, updateLinkedItems = True) -> bool:
+		"""Sets the clip's left (start) edit point to have the given offset (in frames) available. If subframePrecision is True, fractional offsets are allowed for audio clips when the 'Align audio edits to frame boundaries' preference is off. Otherwise, the offset is aligned to whole frames. If updateLinkedItems is True, linked items are also adjusted."""
+		...
+	def SetRightOffset(self, offset: float, subframePrecision = False, updateLinkedItems = True) -> bool:
+		"""Sets the clip's right (end) edit point to have the given offset (in frames) available. If subframePrecision is True, fractional offsets are allowed for audio clips when the 'Align audio edits to frame boundaries' preference is off. Otherwise, the offset is aligned to whole frames. If updateLinkedItems is True, linked items are also adjusted."""
+		...
 	def GetFusionCompCount(self) -> int:
 		"""Returns number of Fusion compositions associated with the timeline item"""
 		...
@@ -2432,6 +2880,15 @@ class TimelineItem:
 	def AddFusionComp(self) -> FusionComp:
 		"""Adds a new Fusion composition associated with the timeline item"""
 		...
+	def AddEffect(self, category: str, id: str) -> Effect | None:
+		"""Applies the effect with the provided category ('fusion', 'ofx' or 'audio') and id (see Resolve.GetEffectsList) to this timeline item"""
+		...
+	def GetEffects(self, category: str) -> list[Effect]:
+		"""Returns the effects of the given category ('fusion', 'ofx' or 'audio') applied to this timeline item"""
+		...
+	def DeleteEffects(self, effects: list[Effect]) -> bool:
+		"""Removes the given effects from this timeline item"""
+		...
 	def GetMediaPoolItem(self) -> MediaPoolItem | None:
 		"""Returns the media pool item corresponding to the timeline item if one exists"""
 		...
@@ -2446,6 +2903,9 @@ class TimelineItem:
 		...
 	def DeleteMarkerByCustomData(self, customData: str) -> bool:
 		"""Deletes first matching marker with specified customData"""
+		...
+	def ExportFrame(self, frameOffset: int, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
+		"""Exports the frame at frameOffset (0-based offset from the item start) as a still image per exportFrameOptions."""
 		...
 	def GetMarkers(self) -> dict[int, MarkerInfo]:
 		"""Returns a dict (frameId -> {information}) of all markers and dicts with their information"""
@@ -2540,6 +3000,9 @@ class TimelineItem:
 	def GetTakesCount(self) -> int:
 		"""Returns the number of takes in take selector, or 0 if the clip is not a take selector"""
 		...
+	def AnalyzeAudioLevels(self, standard: str) -> AudioLevelsInfo:
+		"""Analyzes audio loudness levels for this timeline item. 'standard' is a mode name from timeline.GetNormalizeAudioModes(), excluding the peak-only 'Sample Peak Program' and 'True Peak' modes."""
+		...
 	def GetTakeByIndex(self, idx: int) -> TakeInfo | None:
 		"""Returns a dict with take info for specified index"""
 		...
@@ -2554,6 +3017,9 @@ class TimelineItem:
 		...
 	def CopyGrades(self, tgtTimelineItems: list[TimelineItem]) -> bool:
 		"""Copies the current node stack layer grade to the same layer for each item in tgtTimelineItems."""
+		...
+	def CopyAttributes(self, targetItems: list[TimelineItem], options: CopyAttributesOptions) -> bool:
+		"""Pastes the selected attributes from this item onto each item in targetItems. Equivalent to the Edit page's \"Paste Attributes\"."""
 		...
 	def GetClipEnabled(self) -> bool:
 		"""Gets clip enabled status"""
@@ -2583,7 +3049,7 @@ class TimelineItem:
 		"""Performs stabilization on the clip"""
 		...
 	def SmartReframe(self) -> bool:
-		"""Performs Smart Reframe."""
+		"""Performs Smart Reframe, tracking the subject and repositioning it within the item's existing frame. It does not itself crop or rescale, so the frame must already be filled for the reposition to have anything to work with: when reframing to another aspect ratio, set the timeline's resolution and its 'timelineInputResMismatchBehavior' to 'scaleToCrop' first, then call this."""
 		...
 	def GetNodeGraph(self, layerIdx: int | None = None) -> Graph:
 		"""Returns the clip's node graph object at layerIdx (int, optional). Returns the first layer if layerIdx is skipped. 1 <= layerIdx <= project.GetSetting('nodeStackLayers')"""
@@ -2605,6 +3071,12 @@ class TimelineItem:
 		...
 	def GetTrackTypeAndIndex(self) -> list[str | int]:
 		"""Returns a list of two values that correspond to the TimelineItem's trackType (string) and trackIndex (int) respectively"""
+		...
+	def GetPosition(self, subframePrecision = False) -> TimelineItemPosition:
+		"""Returns the TimelineItem's current absolute position. Returns a fractional frame if subframePrecision is True"""
+		...
+	def SetPosition(self, position: TimelineItemPosition, moveLinkedItems = True, subframePrecision = False) -> bool:
+		"""Updates the TimelineItem's position on the timeline. If subframePrecision is True, fractional startFrame values are allowed for audio clips when the 'Align audio edits to frame boundaries' preference is off. Otherwise, the position is aligned to whole frames."""
 		...
 	def GetSourceAudioChannelMapping(self) -> str:
 		"""Returns a string with TimelineItem's audio mapping information"""
@@ -2657,6 +3129,9 @@ class TimelineItem:
 	def SetFades(self, fades: FadeInfo) -> bool:
 		"""Sets the fade durations (in frames) for the item's video or audio fader from a dict {FadeIn, FadeOut}"""
 		...
+	def RippleDeleteSilence(self, removeSilenceOptions: RemoveSilenceOptions | None = None) -> bool:
+		"""Ripple deletes silent portions from this audio TimelineItem."""
+		...
 
 class ColorGroup:
 	"""A group of clips sharing a pre-clip and a post-clip grade."""
@@ -2669,6 +3144,9 @@ class ColorGroup:
 	def GetClipsInTimeline(self, timeline: Timeline | None = None) -> list[TimelineItem]:
 		"""Returns a list of TimelineItems in the ColorGroup for the given Timeline"""
 		...
+	def GetPhotosInPhotoAlbum(self, photoAlbum: PhotoAlbum | None = None) -> list[PhotoAlbumItem]:
+		"""Returns a list of PhotoAlbumItems in the ColorGroup for the given PhotoAlbum. Uses the current photo album if photoAlbum is omitted"""
+		...
 	def GetPreClipNodeGraph(self) -> Graph:
 		"""Returns the ColorGroup Pre-clip graph"""
 		...
@@ -2676,10 +3154,34 @@ class ColorGroup:
 		"""Returns the ColorGroup Post-clip graph"""
 		...
 
+class Effect:
+	"""A Fusion, OFX or Audio effect applied to a TimelineItem or PhotoAlbumItem."""
+	def GetInfo(self) -> EffectInfo | None:
+		"""Returns information about the effect"""
+		...
+	def GetIsEnabled(self) -> bool:
+		"""Returns whether the effect is enabled"""
+		...
+	def SetIsEnabled(self, enabled: bool) -> bool:
+		"""Sets whether the effect is enabled"""
+		...
+	def GetFusionComp(self) -> FusionComp | None:
+		"""Returns the Fusion composition object for this effect, or None if it's not a Fusion effect"""
+		...
+	def GetIndex(self) -> int | None:
+		"""Returns the effect's 1-based index among its siblings' effects of the same category, or None if it's no longer applied"""
+		...
+	def SetIndex(self, index: int) -> bool:
+		"""Moves the effect to the given 1-based index among its sibling effects"""
+		...
+
 class Folder:
 	"""A media pool folder: its clips, its subfolders and their analysis."""
 	def GetName(self) -> str:
 		"""Returns the media folder name"""
+		...
+	def GetParentFolder(self) -> Folder:
+		"""Returns the Folder object containing this folder, or None for the root folder."""
 		...
 	def GetSubFolderList(self) -> list[Folder]:
 		"""Returns a list of subfolders in the folder"""
@@ -2715,7 +3217,7 @@ class Folder:
 		"""Perform Intellisearch analysis to all the MediaPoolItems in the folder."""
 		...
 	def AnalyzeForSlate(self, markerColor: SlateMarkerColor) -> bool:
-		"""Perform Slate analysis with current settings and use the stated markerColor to all the MediaPoolItems in the folder."""
+		"""Perform Slate analysis with current settings and use the stated markerColor to all the MediaPoolItems in the folder. Adds a 'Detected Slate' duration marker over the frames of each slate found; the text written on the slate is not read."""
 		...
 
 class Gallery:
@@ -2789,6 +3291,15 @@ class Graph:
 	def GetNodeLabel(self, nodeIndex: int) -> str:
 		"""Returns the label of the node at nodeIndex"""
 		...
+	def SetNodeLabel(self, nodeIndex: int, label: str) -> bool:
+		"""Sets the label of the node at nodeIndex, 1 <= nodeIndex <= GetNumNodes()"""
+		...
+	def GetNodeColor(self, nodeIndex: int) -> NodeColor | Literal['']:
+		"""Returns the color of the node at nodeIndex as a string, or an empty string if no color is set"""
+		...
+	def SetNodeColor(self, nodeIndex: int, colorName: NodeColor | Literal['']) -> bool:
+		"""Sets the color of the node at nodeIndex based on the colorName (string). An empty string clears the color. 1 <= nodeIndex <= GetNumNodes()"""
+		...
 	def GetToolsInNode(self, nodeIndex: int) -> list[str]:
 		"""Returns toolsList of the tools used in the node indicated by given nodeIndex"""
 		...
@@ -2798,9 +3309,8 @@ class Graph:
 	def ApplyArriCdlLut(self) -> bool:
 		"""Applies ARRI CDL and LUT."""
 		...
-	def ApplyGradeFromDRX(self, path: str, gradeMode: int, applyToAllLayers = False) -> bool:
-		"""Loads a still from given file path and applies grade to graph with gradeMode (0=No keyframes, 1=Source Timecode aligned, 2=Start Frames aligned). "
-               "If applyToAllLayers is True, the grade is applied to all node-stack layers instead of just the active layer."""
+	def ApplyGradeFromDRX(self, path: str, gradeMode: int, applyToAllLayers = False, keyframeMode = Resolve.KEYFRAME_MODE_ALL) -> bool:
+		"""Loads a still from given file path and applies grade to graph with gradeMode (0=No keyframes, 1=Source Timecode aligned, 2=Start Frames aligned). If applyToAllLayers is True, the grade is applied to all node-stack layers instead of just the active layer. keyframeMode selects what is applied, one of the resolve.KEYFRAME_MODE_* constants (default KEYFRAME_MODE_ALL)."""
 		...
 	def ResetAllGrades(self) -> bool:
 		"""Resets all grades in the graph"""
@@ -2842,7 +3352,174 @@ class MediaStorage:
 		"""Returns a dict with the status of the current (or most recently started) clone job"""
 		...
 
+class PhotoAlbum:
+	"""A photo album: photo items and markers."""
+	def GetName(self) -> str:
+		"""Returns the photo album name."""
+		...
+	def SetName(self, photoAlbumName: str) -> bool:
+		"""Sets the photo album name if photoAlbumName (string) is unique."""
+		...
+	def GetUniqueId(self) -> str:
+		"""Returns a unique ID for the photo album"""
+		...
+	def GetPhotoList(self) -> list[PhotoAlbumItem]:
+		"""Returns a list of photo album items in the photo album."""
+		...
+	def GetCurrentItem(self) -> PhotoAlbumItem | None:
+		"""Returns the current photo album item."""
+		...
+	def DeletePhotos(self, photoAlbumItems: list[PhotoAlbumItem]) -> bool:
+		"""Deletes specified PhotoAlbumItems from the photo album."""
+		...
+	def GetNodeGraph(self) -> Graph:
+		"""Returns the photo album's node graph object."""
+		...
+	def GetMediaPoolItem(self) -> MediaPoolItem | None:
+		"""Returns the media pool item corresponding to the photo album"""
+		...
+	def GrabStill(self) -> GalleryStill:
+		"""Grabs still from the current photo. Returns a GalleryStill object."""
+		...
+	def GrabAllStills(self) -> list[GalleryStill]:
+		"""Grabs stills from all photos in the photo album."""
+		...
+
+class PhotoAlbumItem:
+	"""A photo item in a photo album with color grades, flags, and Fusion compositions. See README.md section 'Looking up Photo Album Item properties'."""
+	def GetName(self) -> str:
+		"""Returns the item name"""
+		...
+	def SetName(self, name: str) -> bool:
+		"""Sets the photo's name to name."""
+		...
+	def GetUniqueId(self) -> str:
+		"""Returns a unique ID for the photo album item"""
+		...
+	def GetFusionCompCount(self) -> int:
+		"""Returns number of Fusion compositions associated with the photo album item"""
+		...
+	def GetFusionCompNameList(self) -> list[str]:
+		"""Returns a list of Fusion composition names associated with the photo album item"""
+		...
+	def GetFusionCompByIndex(self, compIndex: int) -> FusionComp | None:
+		"""Returns the Fusion composition object based on given index. 1 <= compIndex <= photoAlbumItem.GetFusionCompCount()"""
+		...
+	def GetFusionCompByName(self, compName: str) -> FusionComp | None:
+		"""Returns the Fusion composition object based on given name"""
+		...
+	def AddFusionComp(self) -> FusionComp:
+		"""Adds a new Fusion composition associated with the photo album item"""
+		...
+	def DeleteFusionCompByName(self, compName: str) -> bool:
+		"""Deletes the named Fusion composition"""
+		...
+	def LoadFusionCompByName(self, compName: str) -> FusionComp:
+		"""Loads the named Fusion composition as the active composition"""
+		...
+	def RenameFusionCompByName(self, oldName: str, newName: str) -> bool:
+		"""Renames the Fusion composition identified by oldName"""
+		...
+	def ImportFusionComp(self, path: str) -> FusionComp:
+		"""Imports a Fusion composition from given file path by creating and adding a new composition for the item"""
+		...
+	def ExportFusionComp(self, path: str, compIndex: int) -> bool:
+		"""Exports the Fusion composition based on given index to the path provided"""
+		...
+	def GetMediaPoolItem(self) -> MediaPoolItem | None:
+		"""Returns the media pool item corresponding to the photo album item if one exists"""
+		...
+	def AddFlag(self, color: FlagColor) -> bool:
+		"""Adds a flag with given color (string)"""
+		...
+	def GetFlagList(self) -> list[str]:
+		"""Returns a list of flag colors assigned to the item"""
+		...
+	def ClearFlags(self, color: FlagColor | Literal['All']) -> bool:
+		"""Clears flags of the specified color. An 'All' argument is supported to clear all flags"""
+		...
+	def GetClipColor(self) -> ClipColor | Literal['']:
+		"""Returns the item color as a string"""
+		...
+	def SetClipColor(self, colorName: ClipColor) -> bool:
+		"""Sets the item color based on the colorName (string)"""
+		...
+	def ClearClipColor(self) -> bool:
+		"""Clears the item color"""
+		...
+	def CopyGrades(self, tgtPhotoAlbumItems: list[PhotoAlbumItem]) -> bool:
+		"""Copies the current node stack layer grade to the same layer for each item in tgtPhotoAlbumItems."""
+		...
+	def GetCurrentVersion(self) -> VersionInfo:
+		"""Returns the current version of the photo. The returned value will have the keys versionName and versionType (always 1 - remote, as photo albums only support remote versions)"""
+		...
+	def RenameVersionByName(self, oldName: str, newName: str) -> bool:
+		"""Renames the color version identified by oldName. Photo albums only support remote versions"""
+		...
+	def DeleteVersionByName(self, versionName: str) -> bool:
+		"""Deletes a color version by name. Photo albums only support remote versions"""
+		...
+	def LoadVersionByName(self, versionName: str) -> bool:
+		"""Loads a named color version as the active version. Photo albums only support remote versions"""
+		...
+	def AddVersion(self, versionName: str) -> bool:
+		"""Adds a new color version for a photo. Photo albums only support remote versions"""
+		...
+	def GetVersionNameList(self) -> list[str]:
+		"""Returns a list of all color versions. Photo albums only support remote versions"""
+		...
+	def SetCDL(self, CDL: CDL) -> bool:
+		"""Sets CDL values on the node. Keys of map are: 'NodeIndex', 'Slope', 'Offset', 'Power', 'Saturation'"""
+		...
+	def GetNodeGraph(self, layerIdx: int | None = None) -> Graph:
+		"""Returns the photo's node graph object at layerIdx (int, optional). Returns the first layer if layerIdx is skipped. 1 <= layerIdx <= project.GetSetting('nodeStackLayers')"""
+		...
+	def ResetAllNodeColors(self) -> bool:
+		"""Resets node color for all nodes in the active version of the photo."""
+		...
+	def ExportLUT(self, exportType: ExportLutType, path: str) -> bool:
+		"""Exports a LUT of the size given by 'exportType', saving it in the provided 'path'"""
+		...
+	def GetColorGroup(self) -> ColorGroup | None:
+		"""Returns the photo's color group if one exists"""
+		...
+	def AssignToColorGroup(self, colorGroup: ColorGroup) -> bool:
+		"""Assigns the photo to the given ColorGroup. ColorGroup must be an existing group in the current project"""
+		...
+	def RemoveFromColorGroup(self) -> bool:
+		"""Removes the photo from its ColorGroup"""
+		...
+	def LoadBurnInPreset(self, presetName: str) -> bool:
+		"""Loads user defined data burn in preset for photo when supplied presetName (string)."""
+		...
+	def GetRatings(self) -> int:
+		"""Returns the photo rating in stars (0-5)"""
+		...
+	def SetRatings(self, stars: int) -> bool:
+		"""Sets the photo rating to stars (int, 0-5)"""
+		...
+	def AddEffect(self, category: str, id: str) -> Effect | None:
+		"""Applies the effect with the provided category and id (see Resolve.GetEffectsList) to this photo album item"""
+		...
+	def GetEffects(self, category: str) -> list[Effect]:
+		"""Returns the effects of the given category ('fusion' or 'ofx') applied to this photo album item"""
+		...
+	def DeleteEffects(self, effects: list[Effect]) -> bool:
+		"""Removes the given effects from this photo album item"""
+		...
+	def ExportFrame(self, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
+		"""Exports the photo as a still image per exportFrameOptions."""
+		...
+	def GetProperties(self) -> PhotoAlbumItemProperties:
+		"""Returns a dict with all supported photo properties (source transform, cropping and looks). See README.md section 'Looking up Photo Album Item properties'."""
+		...
+	def SetProperties(self, properties: PhotoAlbumItemProperties) -> bool:
+		"""Sets the photo properties (source transform, cropping and looks) with the specified dict of property keys and values. See README.md section 'Looking up Photo Album Item properties'."""
+		...
+
 class Fusion: ...
 class FusionComp: ...
+class STYPE_BOOL: ...
+class STYPE_STR: ...
 
 def scriptapp(app: str) -> Resolve: ...
