@@ -659,7 +659,7 @@ class ProjectSettings(TypedDict, total=False):
 	timelineInterlaceProcessing: str
 	"""'0' or '1'"""
 	timelinePlaybackFrameRate: str
-	"""Read-only. e.g. '24'"""
+	"""e.g. '24'. Updated automatically when timelineFrameRate is set"""
 	timelineOutputResMatchTimelineRes: str
 	"""'0' or '1'"""
 	timelineOutputResolutionWidth: str
@@ -1004,6 +1004,16 @@ class ExportFrameOptions(TypedDict, total=False):
 	"""Output file path, format inferred from extension (required when outputType is 'file')"""
 	maxDimension: int | None
 	"""Caps the longer edge in pixels, scaling the other edge proportionally (default: 0, no scaling)"""
+	quality: int | None
+	"""Image quality 1 to 100 (JPEG only, default: 100)"""
+	roiX: float | None
+	"""Left edge of the region of interest, as a fraction of the frame width, 0 to 1 (default: 0)"""
+	roiY: float | None
+	"""Top edge of the region of interest, as a fraction of the frame height, 0 to 1 (default: 0)"""
+	roiWidth: float | None
+	"""Width of the region of interest, as a fraction of the frame width (default: 1, the whole width). Only supported for jpg and png output. maxDimension then caps the region instead of the whole frame, so the frame is rendered large enough for the region to reach it"""
+	roiHeight: float | None
+	"""Height of the region of interest, as a fraction of the frame height (default: 1, the whole height). Note the fractions are per-axis, so equal roiWidth and roiHeight are not a square region unless the frame is square"""
 
 class ExportFrameResult(TypedDict, total=False):
 	success: bool
@@ -1012,6 +1022,48 @@ class ExportFrameResult(TypedDict, total=False):
 	"""Error message (set on failure)"""
 	data: str | None
 	"""Base64-encoded image bytes (set when outputType is 'encodedString' and success is True)"""
+	width: int | None
+	"""Width in pixels of the exported frame, after maxDimension was applied (set when success is True)"""
+	height: int | None
+	"""Height in pixels of the exported frame, after maxDimension was applied (set when success is True)"""
+
+class ThumbnailFrame(TypedDict, total=False):
+	frameOffset: int
+	"""0-based frame offset into the source, as ExportFrame takes"""
+	label: str | None
+	"""Drawn over the cell (default: the frame offset). Use it to label cells with a timecode or a clip name, so what the grid shows reads back to the source"""
+
+class ExportThumbnailsOptions(TypedDict, total=False):
+	outputType: str | None
+	"""'file' or 'encodedString' (default: 'encodedString')"""
+	encodedImageFormat: str | None
+	"""'jpg' or 'png', used when outputType is 'encodedString' (default: 'jpg')"""
+	filePath: str | None
+	"""Output file path, format inferred from extension (required when outputType is 'file')"""
+	maxDimension: int | None
+	"""Caps the longer edge of the whole sheet in pixels, not of one cell (default: 0, no scaling). The budget is split across the cells, so more frames means smaller cells"""
+	quality: int | None
+	"""Image quality in percent, 1 to 100 (JPEG only, ignored by the other formats, default: 100)"""
+
+class ExportThumbnailsResult(TypedDict, total=False):
+	success: bool
+	"""True if the thumbnails were composited successfully"""
+	error: str | None
+	"""Error message (set on failure)"""
+	data: str | None
+	"""Base64-encoded image bytes (set when outputType is 'encodedString' and success is True)"""
+	width: int | None
+	"""Width in pixels of the composited sheet (set when success is True)"""
+	height: int | None
+	"""Height in pixels of the composited sheet (set when success is True)"""
+	columns: int | None
+	"""Cells per row of the grid, chosen to keep the sheet near square (set when success is True)"""
+	rows: int | None
+	"""Rows of the grid. Cells fill it left to right, top to bottom, in the order frames were given (set when success is True)"""
+	cellWidth: int | None
+	"""Width in pixels of one cell (set when success is True)"""
+	cellHeight: int | None
+	"""Height in pixels of one cell (set when success is True)"""
 
 class RenderJobInfo(TypedDict, total=False):
 	JobId: str
@@ -1206,6 +1258,20 @@ class SmartSwitchSettings(TypedDict, total=False):
 	"""Switch on video only, not supported in adaptive/source mode (default: False)"""
 	quality: SmartSwitchQuality
 	"""Default: resolve.SMART_SWITCH_QUALITY_BETTER"""
+
+class ExtrasPackageInfo(TypedDict, total=False):
+	name: str
+	"""Display name, also the identifier accepted by InstallExtrasPackage(), e.g. 'AI Slate ID'"""
+	description: str
+	"""Localized description of the Extras Package"""
+	status: str
+	"""'installed', 'downloading', 'installing' or 'notInstalled'"""
+	progress: float
+	"""How far the phase named by status has got, 0.0 to 1.0"""
+	downloadSize: int
+	"""Download size in bytes"""
+	installedSize: int
+	"""Size on disk once installed, in bytes"""
 
 class SpeechSettings(TypedDict, total=False):
 	TextInput: str
@@ -1974,6 +2040,15 @@ class Resolve:
 	def IsStudio(self) -> bool:
 		"""Returns whether this is the Studio version of the product"""
 		...
+	def GetExtrasPackages(self) -> list[ExtrasPackageInfo]:
+		"""Returns the Extras Download Manager packages available for this system: optional packages, mostly AI models, that Studio and AI functions require. See README.md section 'Studio and AI Scripting APIs'."""
+		...
+	def InstallExtrasPackage(self, name: str) -> bool:
+		"""Queues the installation of an Extras Package, as given by the 'name' of a GetExtrasPackages() entry. Poll GetExtrasPackages() for status and progress."""
+		...
+	def UninstallExtrasPackage(self, name: str) -> bool:
+		"""Queues removal of an Extras Package, as given by the 'name' of a GetExtrasPackages() entry. Cancels an ongoing download."""
+		...
 	def GetLayoutPresetList(self) -> list[str]:
 		"""Returns a list of available UI layout preset names"""
 		...
@@ -2502,6 +2577,9 @@ class MediaPoolItem:
 	def ExportFrame(self, frameOffset: int, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
 		"""Exports the frame at frameOffset (0-based offset from the item start) as a still image per exportFrameOptions."""
 		...
+	def ExportThumbnails(self, frames: list[int | ThumbnailFrame], exportThumbnailsOptions: ExportThumbnailsOptions | None = None) -> ExportThumbnailsResult:
+		"""Renders the given frames (0-based offsets from the item start) into a single grid image, filled in the order given"""
+		...
 	def DeleteMarkerAtFrame(self, frameNum: int) -> bool:
 		"""Delete marker at frame number from the media pool item."""
 		...
@@ -2675,6 +2753,9 @@ class Timeline:
 		...
 	def ExportFrame(self, frameOffset: int, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
 		"""Exports the frame at frameOffset (0-based offset from the timeline start) as a still image per exportFrameOptions."""
+		...
+	def ExportThumbnails(self, frames: list[int | ThumbnailFrame], exportThumbnailsOptions: ExportThumbnailsOptions | None = None) -> ExportThumbnailsResult:
+		"""Renders the given frames (0-based offsets from the timeline start) into a single grid image, filled in the order given"""
 		...
 	def AddTrack(self, trackType: TrackType, subTrackType: str | None = None) -> bool:
 		"""Adds track of TrackType. Optional argument subTrackType."""
@@ -2907,6 +2988,9 @@ class TimelineItem:
 	def ExportFrame(self, frameOffset: int, exportFrameOptions: ExportFrameOptions | None = None) -> ExportFrameResult:
 		"""Exports the frame at frameOffset (0-based offset from the item start) as a still image per exportFrameOptions."""
 		...
+	def ExportThumbnails(self, frames: list[int | ThumbnailFrame], exportThumbnailsOptions: ExportThumbnailsOptions | None = None) -> ExportThumbnailsResult:
+		"""Renders the given frames (0-based offsets from the item start) into a single grid image, filled in the order given"""
+		...
 	def GetMarkers(self) -> dict[int, MarkerInfo]:
 		"""Returns a dict (frameId -> {information}) of all markers and dicts with their information"""
 		...
@@ -2991,6 +3075,9 @@ class TimelineItem:
 	def SetCDL(self, CDL: CDL) -> bool:
 		"""Sets CDL values on the node. Keys of map are: 'NodeIndex', 'Slope', 'Offset', 'Power', 'Saturation'"""
 		...
+	def GetCDL(self, nodeIndex: int) -> CDL:
+		"""Returns the ASC CDL equivalent of the primaries of the node at nodeIndex, as the dict"""
+		...
 	def AddTake(self, mediaPoolItem: MediaPoolItem, startFrame: int | None = None, endFrame: int | None = None) -> bool:
 		"""Adds mediaPoolItem as a new take. Initializes a take selector for the timeline item if needed. By default, the full clip extents is added. startFrame and endFrame are optional arguments used to specify the extents"""
 		...
@@ -3017,6 +3104,18 @@ class TimelineItem:
 		...
 	def CopyGrades(self, tgtTimelineItems: list[TimelineItem]) -> bool:
 		"""Copies the current node stack layer grade to the same layer for each item in tgtTimelineItems."""
+		...
+	def ApplyAutoColor(self) -> bool:
+		"""Analyses the clip and applies the automatic balance and grade to frame the playhead is on, or from the first frame of the clip when it is not the current one. Replaces the grade of a previous call and clears the legacy auto color values."""
+		...
+	def SetAutoColorEnabled(self, enabled: bool) -> bool:
+		"""Enables or disables the grade a previous ApplyAutoColor() applied"""
+		...
+	def GetAutoColorEnabled(self) -> bool | None:
+		"""Returns whether auto color is applied and enabled, none if it has no auto color"""
+		...
+	def ClearAutoColor(self) -> bool:
+		"""Discards auto-color grades"""
 		...
 	def CopyAttributes(self, targetItems: list[TimelineItem], options: CopyAttributesOptions) -> bool:
 		"""Pastes the selected attributes from this item onto each item in targetItems. Equivalent to the Edit page's \"Paste Attributes\"."""
@@ -3301,10 +3400,13 @@ class Graph:
 		"""Sets the color of the node at nodeIndex based on the colorName (string). An empty string clears the color. 1 <= nodeIndex <= GetNumNodes()"""
 		...
 	def GetToolsInNode(self, nodeIndex: int) -> list[str]:
-		"""Returns toolsList of the tools used in the node indicated by given nodeIndex"""
+		"""Returns the list of tools the node at nodeIndex uses, as the node tooltip shows them: the applied LUT ('LUT: name'), the OFX plugin ('OFX: name') and every group of parameters moved off its default ('Primary Balance', 'Custom Curves', 'HSL Qualifier', ...)"""
 		...
 	def SetNodeEnabled(self, nodeIndex: int, isEnabled: bool) -> bool:
 		"""Sets the node at the given nodeIndex to isEnabled, 1 <= nodeIndex <= GetNumNodes()"""
+		...
+	def GetNodeEnabled(self, nodeIndex: int) -> bool:
+		"""Returns whether the node at the given nodeIndex is enabled, 1 <= nodeIndex <= GetNumNodes()"""
 		...
 	def ApplyArriCdlLut(self) -> bool:
 		"""Applies ARRI CDL and LUT."""
@@ -3313,7 +3415,7 @@ class Graph:
 		"""Loads a still from given file path and applies grade to graph with gradeMode (0=No keyframes, 1=Source Timecode aligned, 2=Start Frames aligned). If applyToAllLayers is True, the grade is applied to all node-stack layers instead of just the active layer. keyframeMode selects what is applied, one of the resolve.KEYFRAME_MODE_* constants (default KEYFRAME_MODE_ALL)."""
 		...
 	def ResetAllGrades(self) -> bool:
-		"""Resets all grades in the graph"""
+		"""Resets all grades in the graph. Node labels are cleared too"""
 		...
 
 class MediaStorage:
@@ -3365,6 +3467,9 @@ class PhotoAlbum:
 		...
 	def GetPhotoList(self) -> list[PhotoAlbumItem]:
 		"""Returns a list of photo album items in the photo album."""
+		...
+	def ExportThumbnails(self, photoIndices: list[int], exportThumbnailsOptions: ExportThumbnailsOptions | None = None) -> ExportThumbnailsResult:
+		"""Renders the photos at the given 1-based album positions into a single grid image, one cell per photo labelled with its position, 1 <= photoIndex <= GetPhotoList() size"""
 		...
 	def GetCurrentItem(self) -> PhotoAlbumItem | None:
 		"""Returns the current photo album item."""
@@ -3450,6 +3555,18 @@ class PhotoAlbumItem:
 	def CopyGrades(self, tgtPhotoAlbumItems: list[PhotoAlbumItem]) -> bool:
 		"""Copies the current node stack layer grade to the same layer for each item in tgtPhotoAlbumItems."""
 		...
+	def ApplyAutoColor(self) -> bool:
+		"""Analyses the photo and applies the automatic balance and grade. Replaces the grade of a previous call and clears the legacy auto color values."""
+		...
+	def SetAutoColorEnabled(self, enabled: bool) -> bool:
+		"""Enables or disables the grade a previous ApplyAutoColor() applied"""
+		...
+	def GetAutoColorEnabled(self) -> bool | None:
+		"""Returns whether auto color is applied and enabled, none if it has no auto color"""
+		...
+	def ClearAutoColor(self) -> bool:
+		"""Discards auto-color grades"""
+		...
 	def GetCurrentVersion(self) -> VersionInfo:
 		"""Returns the current version of the photo. The returned value will have the keys versionName and versionType (always 1 - remote, as photo albums only support remote versions)"""
 		...
@@ -3470,6 +3587,9 @@ class PhotoAlbumItem:
 		...
 	def SetCDL(self, CDL: CDL) -> bool:
 		"""Sets CDL values on the node. Keys of map are: 'NodeIndex', 'Slope', 'Offset', 'Power', 'Saturation'"""
+		...
+	def GetCDL(self, nodeIndex: int) -> CDL:
+		"""Returns the ASC CDL equivalent of the primaries of the node at nodeIndex, as the dict"""
 		...
 	def GetNodeGraph(self, layerIdx: int | None = None) -> Graph:
 		"""Returns the photo's node graph object at layerIdx (int, optional). Returns the first layer if layerIdx is skipped. 1 <= layerIdx <= project.GetSetting('nodeStackLayers')"""
